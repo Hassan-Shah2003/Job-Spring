@@ -1,5 +1,18 @@
 {
   "projects": {
     "default": "job-spring-aa067"
-  }
+  },
+  "targets": {
+    "job-spring-aa067": {
+      "hosting": {
+        "production": [
+          "my-Job-Spring-App"
+        ],
+        "development": [
+          "my-job-portal-dev"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }
