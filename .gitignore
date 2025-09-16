@@ -17,6 +17,9 @@ dist-ssr
 .env.development
 .env.production 
 
+# for admin checkout
+.github 
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
