@@ -3,7 +3,8 @@ import React from 'react'
 const App = () => {
   return (
 <>
-<h1>hello form devekop</h1>
+<h3>hello form devekop</h3>
+<p>hello from deve</p>
 </>
   )
 }
