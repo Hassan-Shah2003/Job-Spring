@@ -1,9 +1,10 @@
 import React from 'react'
+import PostJob from './components/jobs/postjob/PostJob'
 
 const App = () => {
   return (
 <>
-<h1>hello</h1>
+    <PostJob></PostJob>
 </>
   )
 }
