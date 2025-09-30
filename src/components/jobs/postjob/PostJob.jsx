@@ -4,14 +4,11 @@ import JobStepThree from './JobStepThree'
 import JobStepFour from './JobStepFour'
 import JobStepFive from './JobStepFive'
 import Navbar from '../../common/Navbar'
-import DefaultStepper from '../../common/SteeperNav.jsx'
-import HorizontalLinearAlternativeLabelStepper from '../../common/SteeperNav.jsx'
 import CustomStepper from '../../common/SteeperNav.jsx'
-import InputField from '../../common/FormInput.jsx'
 
 const PostJob = () => {
   return (
-    <div>
+    <div className='min-h-screen bg-gray-200'>
       <div className='bg-[#244034] h-[600px]'>
         <Navbar></Navbar>
         <div className='text-white  pt-4'>
@@ -21,7 +18,11 @@ const PostJob = () => {
             It only takes a few minutes!
           </p>
         </div>
-        <div className='bg-white'>
+        <div className='flex justify-center mt-20'>
+          <div className='bg-white max-w-4xl rounded p-4'>
+          <CustomStepper></CustomStepper>
+          <JobStepOne></JobStepOne>
+          </div>
         </div>
       </div>
     </div>

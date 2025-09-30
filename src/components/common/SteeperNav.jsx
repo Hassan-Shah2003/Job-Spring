@@ -1,74 +1,81 @@
 import React from "react";
-import { Box, Typography, StepConnector } from "@mui/material";
-import { styled } from "@mui/material/styles";
+import { Box, Typography } from "@mui/material";
 
 const steps = [
-  "Account Setup",
-  "Profile Info",
-  "Preferences",
-  "Review",
-  "Finish",
+  { label: "Basic Info" },
+  { label: "Details" },
+  { label: "Salary" },
+  { label: "Application" },
+  { label: "Preview" },
 ];
 
-// Custom Circle
-const StepCircle = styled(Box)(({ theme, active, completed }) => ({
-  width: 40,
-  height: 40,
-  borderRadius: "50%",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  fontWeight: "bold",
-  fontSize: "1.1rem",
-  backgroundColor: completed
-    ? "green"
-    : active
-    ? theme.palette.primary.main
-    : "#ccc",
-  color: "#fff",
-}));
-
-// Custom Connector (line between steps)
-const Line = styled(Box)(({ active }) => ({
-  flex: 1,
-  height: 4,
-  backgroundColor: active ? "#1976d2" : "#ccc",
-  margin: "0 8px",
-  borderRadius: 2,
-}));
-
-function CustomStepper({ activeStep = 2 }) {
+export default function CustomStepper({ activeStep = 0 }) {
   return (
-    <Box display="flex" alignItems="center" justifyContent="center" p={4}>
-      {steps.map((label, index) => {
-        const isActive = index === activeStep;
-        const isCompleted = index < activeStep;
+    <Box mb={6} position="relative">
+      {/* Progress Background Line */}
+      <Box
+        sx={{
+          position: "absolute",
+          top: 14,
+          left: 40,
+          right: 40,
+          height: 4,
+          bgcolor: "grey.300",
+          zIndex: 0,
+        }}
+      />
+      {/* Progress Filled Line */}
+      <Box
+        sx={{
+          position: "absolute",
+          top: 14,
+          left: 40,
+          height: 4,
+          bgcolor: "#244034", // custom dark green
+          zIndex: 1,
+          width: `${(activeStep / (steps.length - 1)) * 100}%`,
+          transition: "width 0.3s ease",
+        }}
+      />
 
-        return (
-          <React.Fragment key={label}>
-            <Box display="flex" flexDirection="column" alignItems="center">
-              <StepCircle active={isActive ? 1 : 0} completed={isCompleted ? 1 : 0}>
-                {index + 1}
-              </StepCircle>
-              <Typography
-                variant="body1"
+      {/* Steps */}
+      <Box display="flex" justifyContent="space-between" position="relative" zIndex={2}>
+        {steps.map((step, index) => {
+          const isActive = index === activeStep;
+          const isCompleted = index < activeStep;
+          return (
+            <Box key={index} textAlign="center" width="20%">
+              {/* Circle */}
+              <Box
                 sx={{
-                  mt: 1,
-                  fontWeight: isActive ? "bold" : "normal",
-                  color: isActive ? "#1976d2" : isCompleted ? "green" : "gray",
+                  width: 28,
+                  height: 28,
+                  borderRadius: "50%",
+                  mx: "auto",
+                  mb: 1,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontWeight: "bold",
+                  fontSize: 14,
+                  bgcolor: isActive || isCompleted ? "#244034" : "grey.300", // here
+                  color: isActive || isCompleted ? "white" : "grey.500",
                 }}
               >
-                {label}
+                {index + 1}
+              </Box>
+              {/* Label */}
+              <Typography
+                variant="caption"
+                fontWeight={500}
+                sx={{ color: isActive || isCompleted ? "#244034" : "grey.500" }}
+              >
+                {step.label}
               </Typography>
             </Box>
-            {index !== steps.length - 1 && (
-              <Line active={index < activeStep ? 1 : 0} />
-            )}
-          </React.Fragment>
-        );
-      })}
+          );
+        })}
+      </Box>
     </Box>
   );
 }
-
-export default CustomStepper;
