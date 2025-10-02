@@ -19,10 +19,11 @@ const PostJob = () => {
           </p>
         </div>
         <div className='mt-20'>
-          <div className='bg-white w-4xl m-auto p-8 rounded-lg'>
+          <div className='bg-white w-4xl m-auto p-8 shadow-[0_10px_30px_rgba(0,0,0,0.08)] rounded-lg'>
           <CustomStepper></CustomStepper>
-          <JobStepOne></JobStepOne>
+          {/* <JobStepOne></JobStepOne> */}
           {/* <JobStepTwo></JobStepTwo> */}
+          <JobStepThree></JobStepThree>
           </div>
         </div>
       </div>

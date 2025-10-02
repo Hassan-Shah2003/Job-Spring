@@ -17,7 +17,7 @@ const FormFooter = () => {
           </button>
         </div>
         <div>
-          <button className='bg-[#244034] flex items-center gap-3 font-bold text-white p-4 rounded-lg'>Next Step
+          <button className='bg-[#244034] flex items-center gap-3 font-bold text-white p-4 cursor-pointer rounded-lg'>Next Step
             <MoveRight></MoveRight>
           </button>
         </div>
