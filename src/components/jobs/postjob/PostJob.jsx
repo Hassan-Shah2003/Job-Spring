@@ -23,7 +23,8 @@ const PostJob = () => {
           <CustomStepper></CustomStepper>
           {/* <JobStepOne></JobStepOne> */}
           {/* <JobStepTwo></JobStepTwo> */}
-          <JobStepThree></JobStepThree>
+          {/* <JobStepThree></JobStepThree> */}
+          <JobStepFour></JobStepFour>
           </div>
         </div>
       </div>

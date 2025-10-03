@@ -1,6 +1,7 @@
 import { CircleX } from 'lucide-react'
 import React from 'react'
 import FormFooter from '../../common/FormFooter'
+import ProTip from '../../common/ProTips'
 
 const JobStepTwo = () => {
   return (
@@ -66,6 +67,9 @@ const JobStepTwo = () => {
             </input>
             <button className='bg-[#244034] text-white font-bold px-6 py-4 rounded-r-lg border-2 border-[#132e13]'>Add</button>
           </div>
+        </div>
+        <div>
+          <ProTip title="ProTips" message="A clear and detailed job description helps candidates quickly understand if they are the right fit."></ProTip>
         </div>
       </div>
       <FormFooter></FormFooter>

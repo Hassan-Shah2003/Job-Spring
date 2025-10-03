@@ -2,7 +2,7 @@ import { Lightbulb } from "lucide-react";
 
 export default function ProTip({ title, message }) {
   return (
-    <div className="flex items-start p-3 rounded-2xl bg-emerald-100 backdrop-blur-md shadow-md border border-green-200">
+    <div className="flex items-start p-2 rounded-xl bg-gradient-to-r from-emerald-50 to-emerald-100 shadow-md border border-emerald-200">
       <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full bg-gradient-to-r from-green-600 to-emerald-400 text-white shadow">
         <Lightbulb className="w-5 h-5" />
       </div>
