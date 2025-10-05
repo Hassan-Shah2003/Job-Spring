@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
-
+import CheckIcon from "@mui/icons-material/Check";
 const steps = [
   { label: "Basic Info" },
   { label: "Details" },
@@ -48,8 +48,8 @@ export default function CustomStepper({ activeStep = 0 }) {
               {/* Circle */}
               <Box
                 sx={{
-                  width: 28,
-                  height: 28,
+                  width: 32,
+                  height: 32,
                   borderRadius: "50%",
                   mx: "auto",
                   mb: 1,
@@ -58,11 +58,17 @@ export default function CustomStepper({ activeStep = 0 }) {
                   justifyContent: "center",
                   fontWeight: "bold",
                   fontSize: 14,
-                  bgcolor: isActive || isCompleted ? "#244034" : "grey.300", // here
-                  color: isActive || isCompleted ? "white" : "grey.500",
+                  color: "white",
+                  background: isCompleted
+                    ? "linear-gradient(135deg, #244034, #367353)"
+                    : isActive
+                      ? "linear-gradient(135deg, #367353, #244034)"
+                      : "grey.300",
+                  boxShadow: isActive ? "0 0 10px rgba(36, 64, 52, 0.3)" : "none",
+                  transition: "all 0.3s ease",
                 }}
               >
-                {index + 1}
+                {isCompleted ? <CheckIcon sx={{ fontSize: 18 }} /> : index + 1}
               </Box>
               {/* Label */}
               <Typography
