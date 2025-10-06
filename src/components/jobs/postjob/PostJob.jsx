@@ -16,6 +16,7 @@ const PostJob = () => {
     "defaultValues":DefaultValues,
     mode: "onChange", // real-time validation
   });
+    const { handleSubmit, watch } = methods;
 
   const nextStep = () => {
     if (!completeStep.includes(ActiveStep)) {
@@ -52,7 +53,7 @@ const PostJob = () => {
             <div className='bg-white w-7xl m-auto p-8 shadow-[0_10px_30px_rgba(0,0,0,0.08)] rounded-lg'>
               <CustomStepper activeStep={ActiveStep}></CustomStepper>
               <div className='mt-10 p-'>
-                <form    onSubmit={methods.handleSubmit(onSubmit)} className=" onSubmit={methods.handleSubmit(onSubmit)}">
+                <form onSubmit={handleSubmit(onSubmit)}>
                   {step[ActiveStep]}
                 </form>
               </div>

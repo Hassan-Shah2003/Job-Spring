@@ -9,7 +9,7 @@ const JobStepFour = ({ onNext, onBack }) => {
   } = useFormContext();
   return (
 
-    <div form >
+    <div>
         <div>
           <h1 className='font-bold text-2xl mb-5'>Application Settings</h1>
         <div>
@@ -27,7 +27,7 @@ const JobStepFour = ({ onNext, onBack }) => {
 
         <div className='mt-5 h-28 hidden'>
           <label className='font-bold'>Application URL<span className='ml-1 text-red-600'>*</span></label>
-          <input {...register("contactEmail")} className='border-2 border-gray-400 w-full p-4 mt-2 rounded-lg focus:ring-1 focus:outline-none focus:border-[#132e13]' type='text' placeholder='https://...'>
+          <input {...register("applicationUrl")} className='border-2 border-gray-400 w-full p-4 mt-2 rounded-lg focus:ring-1 focus:outline-none focus:border-[#132e13]' type='text' placeholder='https://...'>
           </input>
         </div>
 
@@ -39,7 +39,7 @@ const JobStepFour = ({ onNext, onBack }) => {
 
         <div className='mt-6'>
           <label className='font-bold'>Application Deadline (optional)<span className='ml-1 text-red-600'>*</span></label>
-          <input {...register("applicationUrl")} className='border-2 border-gray-400 w-full p-4 mt-2 rounded-lg focus:ring-1 focus:outline-none focus:border-[#132e13]' type='date' placeholder=''>
+          <input {...register("applicationDeadline")} className='border-2 border-gray-400 w-full p-4 mt-2 rounded-lg focus:ring-1 focus:outline-none focus:border-[#132e13]' type='date' placeholder=''>
           </input>
         </div>
 

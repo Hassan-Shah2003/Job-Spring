@@ -1,87 +1,80 @@
-import { CircleX } from 'lucide-react'
-import React from 'react'
-import FormFooter from '../../common/FormFooter'
-import ProTip from '../../common/ProTips'
-import { useFormContext } from 'react-hook-form'
+import React from "react";
+import { useFormContext } from "react-hook-form";
+import FormInput from "../../common/FormInput";
+import ProTip from "../../common/ProTips";
+import FormFooter from "../../common/FormFooter";
 
-const JobStepTwo = ({ onNext, onBack, showPrevious }) => {
-  const {
-      register,
-      formState: { errors },
-    } = useFormContext();
+const JobStepOne = ({ onNext, onBack }) => {
   return (
-    <form>
-      <div>
-        <h1 className='font-bold text-2xl mb-5'>Job Details</h1>
+    <div>
+      <h1 className="text-xl font-bold">Job Details</h1>
 
-        <div className='mb-15'>
-          <div className='mb-6'>
-            <label className='text-md font-medium'>Job Description<span className='ml-1 text-red-600'>*</span></label>
-            <textarea {...register("description")} className='border-2 border-gray-400 w-full p-4 mt-2 rounded-lg focus:ring-1 focus:outline-none focus:border-[#132e13]' placeholder='enter a name'>
-            </textarea>
-          </div>
+      <div className="mt-5 grid grid-cols-2 gap-6">
+        <FormInput
+          name="description"
+          label="Job Description "
+          placeholder="Describe the role, company culture, and projects..."
+        />
 
-          <div className='mb-6'>
-            <label className='text-md font-medium'>Responsibilities<span className='ml-1 text-red-600'>*</span></label>
-            <textarea {...register("responsibilities")} className='border-2 border-gray-400 w-full p-4 mt-2 rounded-lg focus:ring-1 focus:outline-none focus:border-[#132e13]' placeholder='enter a name'>
-            </textarea>
-          </div>
+        <FormInput
+          name="responsibilities"
+          label="Responsibilities"
+          as="textarea"
+          placeholder={"List key responsibilities (one per line)"}
+        />
 
-          <div className='mb-6'>
-            <label className='text-md font-medium'>Requirements / Qualifications <span className='ml-1 text-red-600'>*</span></label>
-            <textarea {...register("requirements")} className='border-2 border-gray-400 w-full p-4 mt-2 rounded-lg focus:ring-1 focus:outline-none focus:border-[#132e13]' placeholder='enter a name'>
-            </textarea>
-          </div>
+        <FormInput
+          name="requirements"
+          label="Requirements / Qualifications"
+          as="textarea"
+          placeholder={"List requirements (one per line)"}
+        />
 
-          <div className='grid grid-cols-2 gap-3'>
-            <div className='mb-6'>
-              <label className='text-md font-medium'>Experience Level<span className='ml-1 text-red-600'>*</span></label>
-              <select {...register("experienceLevel")} className='border-2 border-gray-400 w-full p-4 mt-2 rounded-lg focus:ring-1 focus:outline-none focus:border-[#132e13]' placeholder='slect a category'>
-                <option>Select experience level</option>
-                <option>Entry Level (0-2 years)</option>
-                <option>Mid Level (3-5 years)</option>
-                <option>Senior Level (5+ years)</option>
-                <option>Landscape Architecture</option>
-                <option>Construction Management</option>
-                <option>others</option>
-              </select>
-            </div>
+        <FormInput
+          name="experienceLevel"
+          label="Experience Level"
+          as="select"
+          options={[
+            "Select experience level",
+            "Entry Level (0-2 years)",
+            "Mid Level (3-5 years)",
+            "Senior Level (5+ years)",
+            "Others",
+          ]}
+        />
 
-            <div className='mb-6'>
-              <label className='text-md font-medium'>Experience Level<span className='ml-1 text-red-600'>*</span></label>
-              <select {...register("educationLevel")} className='border-2 border-gray-400 w-full p-4 mt-2 rounded-lg focus:ring-1 focus:outline-none focus:border-[#132e13]' placeholder='slect a category'>
-                <option>Select education level</option>
-                <option>High School Diploma</option>
-                <option>Associate Degree</option>
-                <option>Bachelor's Degree</option>
-                <option>Master's Degree</option>
-                <option>PhD</option>
-                <option>others</option>
-              </select>
-            </div>
-          </div>
+        <FormInput
+          name="educationLevel"
+          label="Education Requirement (optional)"
+          as="select"
+          options={[
+            "Select education level",
+            "High School Diploma",
+            "Associate Degree",
+            "Bachelor's Degree",
+            "Master's Degree",
+            "PhD",
+          ]}
+        />
 
-          <div className=''>
-            <label className='text-md font-medium'>Skills<span className='ml-1 text-red-600'>*</span></label>
-            <div className='mt-5 mb-5 h-32 overflow-y-auto hidden'>
-              <span className='bg-gray-200 px-4 py-2 rounded-full inline-flex gap-1 ml-2.5'><CircleX className='w-5 hover:text-red-600' /></span>
-              <span className='bg-gray-200 px-4 py-2 rounded-full inline-flex gap-1 ml-2.5'><CircleX className='w-5 hover:text-red-600' /></span>
-              <span className='bg-gray-200 px-4 py-2 rounded-full inline-flex gap-1 ml-2.5'><CircleX className='w-5 hover:text-red-600' /></span>
-            </div>
-            <div className='mb-6 flex'>
-              <input {...register("skills")} className='border-2 border-gray-400 border-r-0 w-full p-4 rounded-l-lg focus:ring-1 focus:outline-none focus:border-[#132e13]' placeholder='enter a name'>
-              </input>
-              <button className='bg-[#244034] text-white font-bold px-6 py-4 rounded-r-lg border-2 border-[#132e13]'>Add</button>
-            </div>
-          </div>
-          <div>
-            <ProTip title="ProTips" message="A clear and detailed job description helps candidates quickly understand if they are the right fit."></ProTip>
-          </div>
+        <FormInput
+          name="skills"
+          label="Skills"
+          placeholder={"Add A Skill"}
+        >
+
+        </FormInput>
+        <div className="mt-3">
+          <ProTip
+            title="Pro Tip"
+            message="Be specific with your job title to attract the right candidates."
+          />
         </div>
-        <FormFooter onNext={onNext} onBack={onBack} showPrevious={true}></FormFooter>
       </div>
-    </form>
-  )
-}
 
-export default JobStepTwo
+      <FormFooter onNext={onNext} onBack={onBack} showPrevious={false} />
+    </div>
+  );
+};
+
+export default JobStepOne;

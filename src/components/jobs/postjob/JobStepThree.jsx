@@ -9,9 +9,7 @@ const JobStepThree = ({ onNext, onBack }) => {
         formState: { errors },
       } = useFormContext();
   return (
-    
-    <form>
-      <div>
+       <div>
         <h1 className="text-xl font-bold mb-5">Salary & Benefits</h1>
 
         <div>
@@ -90,7 +88,6 @@ const JobStepThree = ({ onNext, onBack }) => {
           <FormFooter onNext={onNext} onBack={onBack} showPrevious={true}></FormFooter>
         </div>
       </div>
-    </form>
   )
 }
 

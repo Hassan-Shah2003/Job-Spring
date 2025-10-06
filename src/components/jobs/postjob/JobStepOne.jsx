@@ -1,77 +1,72 @@
-import React from 'react'
-import ProTip from '../../common/ProTips'
-import Button from '../../common/FormFooter'
-import FormFooter from '../../common/FormFooter'
-import { useFormContext } from 'react-hook-form'
+import React from "react";
+import { useFormContext } from "react-hook-form";
+import FormInput from "../../common/FormInput";
+import ProTip from "../../common/ProTips";
+import FormFooter from "../../common/FormFooter";
 
-const JobStepOne = ({FREIND,NDLE AUBIL onNext, onBack, showPrevious }) => {
-   const {
-    register,
-    formState: { errors },
-  } = useFormContext();
+const JobStepOne = ({ onNext, onBack }) => {
   return (
-    <form>
-      <div>
-        <h1 className='text-xl font-bold'>Basic Job Information</h1>
-        <div className='mt-5 grid grid-cols-2 gap-6'>
-          <div className=''>
-            <label className='font-bold'>job title<span className='ml-1 text-red-600'>*</span></label>
-            <input  {...register("title")} className='border-2 border-gray-400 w-full p-4 mt-2 rounded-lg focus:ring-1 focus:outline-none focus:border-[#132e13]' placeholder='enter a name'>
-            </input>
-          </div>
+    <div>
+      <h1 className="text-xl font-bold">Basic Job Information</h1>
 
-          <div className=''>
-            <label className='font-bold'>job Category<span className='ml-1 text-red-600'>*</span></label>
-            <select {...register("category")} className=' border-2 border-gray-400 w-full p-4 mt-2 rounded-lg focus:ring-1 focus:outline-none focus:border-[#132e13]' placeholder='slect a category'>
-              <option>select A Category</option>
-              <option>Architecture</option>
-              <option>Urban Planning</option>
-              <option>Interior Design</option>
-              <option>Landscape Architecture</option>
-              <option>Construction Management</option>
-              <option>others</option>
-            </select>
-          </div>
+      <div className="mt-5 grid grid-cols-2 gap-6">
+        <FormInput
+          name="title"
+          label="Job Title"
+          placeholder="Enter job title"
+        />
 
-          <div className=''>
-            <label  className='font-bold'>job Type<span className='ml-1 text-red-600'>*</span></label>
-            <select {...register("type")} className='border-2 border-gray-400 w-full p-4 mt-2 rounded-lg focus:ring-1 focus:outline-none focus:border-[#132e13]' placeholder='slect a category'>
-              <option>select Job Type</option>
-              <option>Full-time</option>
-              <option>Part-time</option>
-              <option>Contract</option>
-              <option>Internship</option>
-              <option>Construction Management</option>
-              <option>Remote</option>
-            </select>
-          </div>
+        <FormInput
+          name="category"
+          label="Job Category"
+          as="select"
+          options={[
+            "Architecture",
+            "Urban Planning",
+            "Interior Design",
+            "Landscape Architecture",
+            "Construction Management",
+            "Others",
+          ]}
+        />
 
-          <div className=''>
-            <label className='font-bold'>Location<span className='ml-1 text-red-600'>*</span></label>
-            <input {...register("location")} className='border-2 border-gray-400 w-full p-4 mt-2 rounded-lg focus:ring-1 focus:outline-none focus:border-[#132e13]' placeholder='e.g., New York, USA or Remote'>
-            </input>
-          </div>
+        <FormInput
+          name="type"
+          label="Job Type"
+          as="select"
+          options={[
+            "Full-time",
+            "Part-time",
+            "Contract",
+            "Internship",
+            "Remote",
+          ]}
+        />
 
+        <FormInput
+          name="location"
+          label="Location"
+          placeholder="e.g., New York, USA or Remote"
+        />
 
-          <div className=''>
-            <label className='font-bold'>Number Of Openings<span className='ml-1 text-red-600'>*</span></label>
-            <input {...register("openings")} className='border-2 border-gray-400 w-full p-4 mt-2 rounded-lg focus:ring-1 focus:outline-none focus:border-[#132e13]' type='number' placeholder=''>
-            </input>
-          </div>
+        <FormInput
+          name="openings"
+          label="Number of Openings"
+          type="number"
+          placeholder="1"
+        />
 
-
-          <div className='mt-3'>
-            <ProTip title="Pro Tip" message="Be specific with your job title to attract the right candidates."></ProTip>
-          </div>
-
-          <div>
-          </div>
+        <div className="mt-3">
+          <ProTip
+            title="Pro Tip"
+            message="Be specific with your job title to attract the right candidates."
+          />
         </div>
-
-        <FormFooter onNext={onNext} onBack={onBack} showPrevious={false}></FormFooter>
       </div>
-    </form>
-  )
-}
 
-export default JobStepOne
+      <FormFooter onNext={onNext} onBack={onBack} showPrevious={false} />
+    </div>
+  );
+};
+
+export default JobStepOne;
