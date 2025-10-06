@@ -18,10 +18,6 @@ const FormFooter = ({onNext, onBack ,showPrevious, isLastStep}) => {
         </div>
         <div className='flex items-center'>
           {showPrevious&&<button onClick={onBack} className='cursor-pointer flex items-center gap-3 font-bold p-4 rounded-lg bg-gradient-to-r from-[#a8d5ba] to-[#6fbf8d] text-[#0e241d] hover:from-[#99cfae] hover:to-[#63b582]
-
-
-
-
 '><MoveLeft></MoveLeft>Previous
           </button>}
         </div>

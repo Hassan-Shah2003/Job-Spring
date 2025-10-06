@@ -64,7 +64,7 @@ const JobStepOne = ({ onNext, onBack }) => {
         </div>
       </div>
 
-      <FormFooter onNext={onNext} onBack={onBack} showPrevious={false} />
+      <FormFooter   type="button" onNext={onNext} onBack={onBack} showPrevious={false} />
     </div>
   );
 };

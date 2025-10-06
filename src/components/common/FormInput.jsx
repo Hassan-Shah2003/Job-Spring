@@ -1,13 +1,22 @@
 import { Select } from '@mui/material';
 import React from 'react'
 import { Controller, useFormContext } from 'react-hook-form'
+import SkillsInput from './SkillsInput';
 
-const FormInput = ({ name, label, type = "text", as = "input", options = [], placeholder }) => {
+
+const FormInput = ({ name, label, type = "text", as = "input", options = [], placeholder,radioOptions=[]}) => {
   const {
     register,
     formState: { errors },
   } = useFormContext();
+  if (as === "skills") {
+    return <SkillsInput name={name} label={label} />
+  }
+  // if (as === "radio") {
+  //   return <Radioinput name={name} label={label} radioOptions={radioOptions} />
+  // }
 
+  // <CheckBoxInput></CheckBoxInput>
   return (
     <div className='mb-4'>
       <label className="font-bold">
@@ -25,6 +34,13 @@ const FormInput = ({ name, label, type = "text", as = "input", options = [], pla
             </option>
           ))}
         </select>
+      ):as === "textarea"?(
+        <textarea
+          {...register(name)}
+          rows={4}
+          placeholder={placeholder}
+          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-darkgreen focus:border-darkgreen"
+        />
       ):(
         <input
           {...register(name)}

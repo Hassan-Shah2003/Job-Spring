@@ -5,7 +5,8 @@ import { faBuilding, faCircleCheck, faClock, faCog, faCogs, faEye, faGift, faGra
 import FormFooter from '../../common/FormFooter';
 
 
-const JobStepFive = ({ onNext, onBack, showPrevious }) => {
+const JobStepFive = ({ onNext, onBack, showPrevious,isLastStep }) => {
+  // console.log("✅ JobStepFive Rendered");
   return (
     <div className='w-auto'>
       <div className='flex items-center gap-3'>

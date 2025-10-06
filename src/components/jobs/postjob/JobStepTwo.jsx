@@ -3,16 +3,18 @@ import { useFormContext } from "react-hook-form";
 import FormInput from "../../common/FormInput";
 import ProTip from "../../common/ProTips";
 import FormFooter from "../../common/FormFooter";
+import SkillsInput from "../../common/SkillsInput";
 
-const JobStepOne = ({ onNext, onBack }) => {
+const JobStepTwo = ({ onNext, onBack,showPrevious }) => {
   return (
     <div>
       <h1 className="text-xl font-bold">Job Details</h1>
 
-      <div className="mt-5 grid grid-cols-2 gap-6">
+      <div className="mt-5 grid grid-cols-1 gap-6">
         <FormInput
           name="description"
-          label="Job Description "
+          label="Job Description"
+          as="textarea"
           placeholder="Describe the role, company culture, and projects..."
         />
 
@@ -57,13 +59,14 @@ const JobStepOne = ({ onNext, onBack }) => {
           ]}
         />
 
-        <FormInput
+        <SkillsInput
           name="skills"
           label="Skills"
-          placeholder={"Add A Skill"}
+          as="skills"
+          placeholder={"Add A skills..."}
         >
 
-        </FormInput>
+        </SkillsInput>
         <div className="mt-3">
           <ProTip
             title="Pro Tip"
@@ -72,9 +75,9 @@ const JobStepOne = ({ onNext, onBack }) => {
         </div>
       </div>
 
-      <FormFooter onNext={onNext} onBack={onBack} showPrevious={false} />
+      <FormFooter   type="button" onNext={onNext} onBack={onBack} showPrevious={true} />
     </div>
   );
 };
 
-export default JobStepOne;
+export default JobStepTwo;
