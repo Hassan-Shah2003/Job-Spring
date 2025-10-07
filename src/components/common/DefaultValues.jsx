@@ -8,7 +8,7 @@ const DefaultValues = {
 
   // STEP 2: Job Details
   description: "",
-  responsibilities: "",
+  responsibilities: [],
   requirements: "",
   experienceLevel: "",
   educationLevel: "",

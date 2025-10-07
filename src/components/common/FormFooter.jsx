@@ -22,7 +22,7 @@ const FormFooter = ({onNext, onBack ,showPrevious, isLastStep}) => {
           </button>}
         </div>
         <div>
-          {!isLastStep?(<button onClick={onNext} className='bg-[#244034] flex items-center gap-3 font-bold text-white p-4 cursor-pointer rounded-lg'>Next Step
+          {!isLastStep?(<button type='button' onClick={onNext} className='bg-[#244034] flex items-center gap-3 font-bold text-white p-4 cursor-pointer rounded-lg'>Next Step
             <MoveRight></MoveRight>
           </button>):
           (<button

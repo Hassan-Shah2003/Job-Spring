@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 
 const SkillsInput = ({label,name}) => {
-    const{setValue,watch}=useFormContext();
+    const{setValue,watch,formState:{ errors }}=useFormContext();
     const [currentSkills, setcurrentSkills] = useState('');
 
       const skills = watch(name) || [];
@@ -65,7 +65,7 @@ const SkillsInput = ({label,name}) => {
           value={currentSkills}
           onChange={(e) => setcurrentSkills(e.target.value)}
           onKeyDown={handleKeyPress}
-          className='border-2 border-gray-400 border-r-0 w-full p-3 rounded-l-lg focus:ring-1 focus:outline-none focus:border-[#132e13]' 
+          className={`border-2 border-gray-400 border-r-0 w-full p-3 rounded-l-lg focus:ring-1 focus:outline-none focus:border-[#132e13] ${errors? "border-red-500":"border-gray-300"}`} 
           placeholder='Enter a skill'
         />
         <button 

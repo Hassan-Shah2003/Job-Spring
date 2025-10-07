@@ -1,12 +1,17 @@
 import { Eye, MapPin, Rocket } from 'lucide-react'
 import React from 'react'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBuilding, faCircleCheck, faClock, faCog, faCogs, faEye, faGift, faGraduationCap, faListCheck, faLocation, faLocationDot, faScrewdriver, faScrewdriverWrench, faStar } from "@fortawesome/free-solid-svg-icons";
+import { faBuilding, faCheckCircle, faCircleCheck, faClock, faCog, faCogs, faEye, faGift, faGraduationCap, faListCheck, faLocation, faLocationDot, faScrewdriver, faScrewdriverWrench, faStar } from "@fortawesome/free-solid-svg-icons";
 import FormFooter from '../../common/FormFooter';
+import { useFormContext } from 'react-hook-form';
 
 
-const JobStepFive = ({ onNext, onBack, showPrevious,isLastStep }) => {
+const JobStepFive = ({ onNext, onBack, showPrevious, isLastStep ,handleSubmit,onSubmit }) => {
   // console.log("✅ JobStepFive Rendered");
+  const { getValues, watch } = useFormContext();
+
+  const formData = getValues();
+  const watchedData = watch();
   return (
     <div className='w-auto'>
       <div className='flex items-center gap-3'>
@@ -40,71 +45,72 @@ const JobStepFive = ({ onNext, onBack, showPrevious,isLastStep }) => {
                 <FontAwesomeIcon icon={faBuilding} size="2xl" style={{ color: "white", }} />
               </div>
               <div className='flex-1'>
-                <h1 className='text-2xl font-extrabold mb-2.5'>microsoft</h1>
-                <h3 className='text-xl font-light text-gray-900'>DesignPlus Architects</h3>
+                <h1 className='text-2xl font-extrabold mb-2.5'>{formData.companyname || "Microsoft"}</h1>
+                <h3 className='text-xl font-light text-gray-900'>{formData.title}</h3>
                 <div className='flex gap-2 mt-2'>
                   <FontAwesomeIcon icon={faLocationDot} />
-                  <span>New York, USA</span>
+                  <span>{formData.location}</span>
                   <div className='flex items-center gap-1'>
                   </div>
                   <div className='flex items-center gap-1'>
                     <FontAwesomeIcon icon={faClock} style={{ color: "#bfbfbf" }} />
-                    <span>Full-time</span>
+                    <span>{formData.type}</span>
                   </div>
                 </div>
               </div>
               <div>
-                <p className='font-extrabold text-2xl'>$90,000 - $120,000</p>
-                <p className='text-right font-light text-xl text-gray-700'>per year</p>
+                <p className='font-extrabold text-2xl'><span>{formData.minSalary}</span> - <span>{formData.maxSalary}</span></p>
+                <p className='text-right font-light text-xl text-gray-700'>per month</p>
               </div>
             </div>
 
             <div className='mt-5'>
               <h2 className='text-lg font-black mb-3'>Job Description</h2>
               <p className='text-gray-600'>
-                We are looking for a skilled Senior Architect to join our growing team...
+                {formData.description}
               </p>
             </div>
           </div>
 
           {/* Responsibilities */}
           <div className='border-2 p-6 border-gray-200 rounded-lg hover:border-l-[#284A3A] hover:border-l-5 w-full shadow-lg transition-all duration-300 ease-in-out  hover:scale-105'>
-            <div className='flex items-center gap-2'>
+            <div className='flex items-center mb-4 gap-2'>
               <FontAwesomeIcon icon={faListCheck} />
               <h2 className='text-lg font-black'>Key Responsibilities</h2>
             </div>
-            <div className='mt-6 space-y-2'>
-              {[
-                "Lead architectural design projects from concept to completion",
-                "Collaborate with clients to understand their needs and vision",
-                "Ensure compliance with building codes and regulations",
-              ].map((task, i) => (
-                <div key={i} className='flex items-center gap-2'>
-                  <FontAwesomeIcon icon={faCircleCheck} size="md" className="text-green-500" />
-                  <ul><li>{task}</li></ul>
-                </div>
-              ))}
-            </div>
+            <ul className="text-gray-700 space-y-3" id="preview-responsibilities">
+              {formData.responsibilities?.length > 0 ? (
+                formData.responsibilities.filter((res)=>res.trim()!=="").map((item, index) => (
+                  <li key={index} className="flex items-start">
+                    <FontAwesomeIcon icon={faCheckCircle} className="text-green-500 mr-3 mt-1"></FontAwesomeIcon>
+                    <span>{item}</span>
+                  </li>
+                ))
+              ) : (
+                <p className="text-gray-500 italic">No responsibilities added</p>
+              )}
+            </ul>
+
           </div>
 
           {/* Requirements */}
           <div className='border-2 p-6 border-gray-200 rounded-lg hover:border-l-[#284A3A] hover:border-l-5 transition-all duration-300 ease-in-out  hover:scale-105 w-full shadow-lg'>
-            <div className='flex items-center gap-2'>
+            <div className='flex items-center mb-4 gap-2'>
               <FontAwesomeIcon icon={faGraduationCap} />
               <h2 className='text-lg font-black'>Requirements & Qualifications</h2>
             </div>
-            <div className='mt-6 space-y-2'>
-              {[
-                "Bachelor’s degree in Architecture or related field",
-                "Strong portfolio of previous projects",
-                "Excellent communication and leadership skills",
-              ].map((req, i) => (
-                <div key={i} className='flex items-center gap-2'>
-                  <FontAwesomeIcon icon={faStar} className="text-yellow-400" />
-                  <ul><li>{req}</li></ul>
-                </div>
-              ))}
-            </div>
+            <ul className="text-gray-700 space-y-3" id="preview-responsibilities">
+              {formData.requirements?.length > 0 ? (
+                formData.requirements.filter((req)=>req.trim()!=="").map((elem, index) => (
+                  <li key={index} className="flex items-start">
+                    <FontAwesomeIcon icon={faStar} className="text-yellow-500 mr-3 mt-1"></FontAwesomeIcon>
+                    <span>{elem}</span>
+                  </li>
+                ))
+              ) : (
+                <p className="text-gray-500 italic">No responsibilities added</p>
+              )}
+            </ul>
           </div>
 
           {/* Skills */}
@@ -115,13 +121,19 @@ const JobStepFive = ({ onNext, onBack, showPrevious,isLastStep }) => {
             </div>
 
             <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3'>
-              {["AutoCAD", "Revit", "SketchUp", "Project Management", "Sustainable Design", "BIM", "Team Leadership"].map((skill) => (
-                <span
-                  key={skill}
-                  className='inline-block px-2 py-2 text-sm text-white bg-[#284A3A] rounded-full text-center transition-transform duration-300 hover:scale-105 hover:shadow-md'>
-                  {skill}
-                </span>
-              ))}
+              {formData.perks?.length > 0 ? (
+                formData.perks.map((perk, index) => (
+                  <span
+                    key={index}
+                    className='inline-flex justify-center items-center border border-[#d1e0d9] bg-gradient-to-br from-[#244034] to-[#2a4b3c] text-white px-4 py-2 rounded-full m-1 text-sm font-medium transition-all duration-300 ease-in-out 
+        hover:bg-green-700 hover:scale-105 shadow-[0_2px_8px_rgba(36,64,52,0.2)]'
+                  >
+                    {perk}
+                  </span>
+                ))
+              ) : (
+                <p className="text-gray-500 italic">No perks added</p>
+              )}
             </div>
           </div>
         </div>
@@ -132,16 +144,19 @@ const JobStepFive = ({ onNext, onBack, showPrevious,isLastStep }) => {
               <FontAwesomeIcon icon={faGift}></FontAwesomeIcon><h2 className='text-xl font-bold'>Benefits & Perks</h2>
             </div>
             <div className='mt-4 h-auto '>
-              <span className='inline-flex items-center border border-[#d1e0d9] bg-gradient-to-br from-[#244034] to-[#2a4b3c] text-white px-4 py-2 rounded-full m-1 text-sm font-medium transition-all duration-300 ease-in-out 
-  hover:bg-green-700 hover:scale-105 shadow-[0_2px_8px_rgba(36,64,52,0.2)]'>Health Insurance</span>
-              <span className='inline-flex items-center border border-[#d1e0d9] bg-gradient-to-br from-[#244034] to-[#2a4b3c] text-white px-4 py-2 rounded-full m-1 text-sm font-medium transition-all duration-300 ease-in-out 
-  hover:bg-green-700 hover:scale-105 shadow-[0_2px_8px_rgba(36,64,52,0.2)]'>Paid Leave</span>
-              <span className='inline-flex items-center border border-[#d1e0d9] bg-gradient-to-br from-[#244034] to-[#2a4b3c] text-white px-4 py-2 rounded-full m-1 text-sm font-medium transition-all duration-300 ease-in-out 
-  hover:bg-green-700 hover:scale-105 shadow-[0_2px_8px_rgba(36,64,52,0.2)]'>Remote Work</span>
-              <span className='inline-flex items-center border border-[#d1e0d9] bg-gradient-to-br from-[#244034] to-[#2a4b3c] text-white px-4 py-2 rounded-full m-1 text-sm font-medium transition-all duration-300 ease-in-out 
-  hover:bg-green-700 hover:scale-105 shadow-[0_2px_8px_rgba(36,64,52,0.2)]'>401(k) Matching</span>
-              <span className='inline-flex items-center border border-[#d1e0d9] bg-gradient-to-br from-[#244034] to-[#2a4b3c] text-white px-4 py-2 rounded-full m-1 text-sm font-medium transition-all duration-300 ease-in-out 
-  hover:bg-green-700 hover:scale-105 shadow-[0_2px_8px_rgba(36,64,52,0.2)]'>Flexible Hours</span>
+              {formData.perks?.length > 0 ? (
+                formData.perks.map((perk, index) => (
+                  <span
+                    key={index}
+                    className='inline-flex items-center border border-[#d1e0d9] bg-gradient-to-br from-[#244034] to-[#2a4b3c] text-white px-4 py-2 rounded-full m-1 text-sm font-medium transition-all duration-300 ease-in-out 
+        hover:bg-green-700 hover:scale-105 shadow-[0_2px_8px_rgba(36,64,52,0.2)]'
+                  >
+                    {perk}
+                  </span>
+                ))
+              ) : (
+                <p className="text-gray-500 italic">No perks added</p>
+              )}
             </div>
           </div>
 
@@ -152,19 +167,19 @@ const JobStepFive = ({ onNext, onBack, showPrevious,isLastStep }) => {
             </div>
             <div className='flex items-center text-lg justify-between gap-2 mb-6'>
               <p>Apply Method:</p>
-              <h2 className='text-lg font-black'>Platform</h2>
+              <h2 className='text-lg font-black'>{formData.applyMethod}</h2>
             </div>
             <div className='flex items-center text-lg justify-between gap-2 mb-6'>
               <p>Contact Email:</p>
-              <h2 className='text-lg font-black'>hs002041@gmail.com</h2>
+              <h2 className='text-lg font-black'>{formData.contactEmail}</h2>
             </div>
             <div className='flex items-center text-lg justify-between gap-2 mb-6'>
               <p>Visibility:</p>
-              <h2 className='text-lg font-black'>Public</h2>
+              <h2 className='text-lg font-black'>{formData.visibility}</h2>
             </div>
             <div className='flex items-center justify-between gap-2 mb-6'>
               <p className='text-gray-700 text-lg'>Deadline::</p>
-              <h2 className='text-lg font-black'>Oct 15, 2023</h2>
+              <h2 className='text-lg font-black'>{formData.applicationDeadline}</h2>
             </div>
           </div>
 
@@ -180,7 +195,7 @@ const JobStepFive = ({ onNext, onBack, showPrevious,isLastStep }) => {
               <label>This listing complies with policies</label>
             </div>
             <div className='flex gap-2 items-center mt-5 border-2 rounded-full p-4 bg-white text-black transition-all duration-300 ease-in-out  hover:scale-105'>
-              <div><Rocket /></div><button className='text-2xl font-extrabold cursor-pointer'>Publish Job Listing</button></div>
+              <div><Rocket /></div><button className='text-2xl font-extrabold cursor-pointer' onClick={handleSubmit(onSubmit)}>Publish Job Listing</button></div>
           </div>
         </div>
       </div>

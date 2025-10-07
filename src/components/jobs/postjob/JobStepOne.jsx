@@ -53,19 +53,21 @@ const JobStepOne = ({ onNext, onBack }) => {
           name="openings"
           label="Number of Openings"
           type="number"
-          placeholder="1"
+          placeholder="0"
         />
 
-        <div className="mt-3">
+        <div className="mt-8">
           <ProTip
             title="Pro Tip"
             message="Be specific with your job title to attract the right candidates."
           />
         </div>
       </div>
-
-      <FormFooter   type="button" onNext={onNext} onBack={onBack} showPrevious={false} />
+      <div className="mt-10">
+      <FormFooter type="button" onNext={onNext} onBack={onBack} showPrevious={false} />
     </div>
+    </div>
+
   );
 };
 

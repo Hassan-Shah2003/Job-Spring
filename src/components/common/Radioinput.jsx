@@ -21,12 +21,18 @@ const Radioinput = ({radioOptions=[],name,label}) => {
                 {...register(name)} 
                 type='radio'
                 value={option.value}
-                className='w-4 h-4 accent-[#244034] text-darkgreen focus:ring-[#244034] border-gray-300'
+                className={`w-4 h-4 accent-[#244034] text-darkgreen focus:ring-[#244034] border-gray-300 ${errors? "border-red-500":"border-gray-300"}`}
               />
               <label className="text-gray-700 text-md">{option.label}</label>
+              
             </div>
+            
           ))}
+          
         </div>
+        {errors.applyMethod && (
+          <p className="text-red-600 text-sm mt-2">{errors.applyMethod.message}</p>
+        )}
         
         {/* Conditional field - Application URL */}
         {selectedValue === "external" && (
@@ -36,10 +42,16 @@ const Radioinput = ({radioOptions=[],name,label}) => {
             </label>
             <input 
               {...register("applicationUrl")} 
-              className='border-2 border-gray-400 w-full p-4 rounded-lg focus:ring-1 focus:outline-none focus:border-[#132e13]' 
+              className={`border-2 border-gray-400 w-full p-4 rounded-lg focus:ring-1 focus:outline-none focus:border-[#132e13] ${errors? "border-red-500":"border-gray-300"}`} 
               type='text' 
               placeholder='https://...'
-            />
+          
+          />
+          {errors.applicationUrl && (
+            <p className="text-red-600 text-sm mt-1">
+              {errors.applicationUrl.message}
+            </p>
+          )}
           </div>
         )}
       </div>
