@@ -9,7 +9,7 @@ const DefaultValues = {
   // STEP 2: Job Details
   description: "",
   responsibilities: [],
-  requirements: "",
+  requirements: [],
   experienceLevel: "",
   educationLevel: "",
   skills: [],
@@ -17,7 +17,7 @@ const DefaultValues = {
   // STEP 3: Salary & Benefits
   minSalary: "",
   maxSalary: "",
-  currency: "PKR (₨)",
+  currency: "",
   negotiable: false,
   perks: [], 
   workSchedule: "",

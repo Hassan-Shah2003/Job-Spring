@@ -40,7 +40,6 @@ const JobStepTwo = ({ onNext, onBack, showPrevious }) => {
         label="Experience Level"
         as="select"
         options={[
-          "Select experience level",
           "Entry Level (0-2 years)",
           "Mid Level (3-5 years)",
           "Senior Level (5+ years)",
@@ -53,7 +52,6 @@ const JobStepTwo = ({ onNext, onBack, showPrevious }) => {
         label="Education Requirement (optional)"
         as="select"
         options={[
-          "Select education level",
           "High School Diploma",
           "Associate Degree",
           "Bachelor's Degree",

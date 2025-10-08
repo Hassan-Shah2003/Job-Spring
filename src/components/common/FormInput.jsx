@@ -1,25 +1,27 @@
 import { Controller, useFormContext } from "react-hook-form";
 
 const FormInput = ({ name, label, type = "text", as = "input", options = [], placeholder }) => {
-  const { register, control, formState: { errors } } = useFormContext();
-
+  const { register, watch, touchedFields, dirtyFields, control, formState: { errors } } = useFormContext();
+  const value = watch(name);
+  const showError = Boolean(errors?.[name]);
   // ✅ Handle Textarea fields
   if (as === "textarea") {
     const isArrayField = name === "responsibilities" || name === "requirements";
 
 
     return (
-      <div className="mb-2">
+      <div className="mb-5">
         <div className="mb-2">
-        <label className="font-bold">
-          {label} <span className="ml-1 text-red-600">*</span>
-        </label>
+          <label className="font-bold">
+            {label} <span className="ml-1 text-red-600">*</span>
+          </label>
         </div>
         <Controller
           name={name}
           control={control}
-          render={({ field: { value, onChange } }) => (
+          render={({ field: { value, onChange, onBlur } }) => (
             <textarea
+              onBlur={onBlur}
               value={
                 isArrayField
                   ? Array.isArray(value)
@@ -27,23 +29,39 @@ const FormInput = ({ name, label, type = "text", as = "input", options = [], pla
                     : ""
                   : value || ""
               }
-              onChange={(e) =>
-                isArrayField
-                  ? onChange(e.target.value.split("\n"))
-                  : onChange(e.target.value)
-              }
+              onChange={(e) => {
+                if (isArrayField) {
+                  const lines = e.target.value
+                    .split("\n")                // har line tod do
+                    .map(line => line.trim())   // har line ke aage-piche space hata do
+                    .filter(line => line !== ""); // blank lines hata do
+
+                  onChange(lines); // array form me update karo
+                } else {
+                  onChange(e.target.value); // normal input me simple string
+                }
+              }}
               rows={4}
               placeholder={placeholder}
               className={`w-full px-4 py-2.5 border-3 rounded-lg 
     focus:ring-1 focus:ring-[#244034] focus:border-[#244034] 
-    ${errors[name] ? "border-red-500" : "border-gray-300"}`}
+    ${showError ? "border-red-500" : "border-gray-300"}`}
             />
           )}
         />
         <div className="">
-        {errors[name] && (
-          <p className="text-red-600 text-sm mt-2 font-bold text-md">{errors[name].message}</p>
-        )}
+          {errors[name]?.message && (
+            <p className="text-red-600 text-sm mt-2 font-bold text-md">{errors[name]?.message}</p>
+          )}
+          {Array.isArray(errors[name]) &&
+            errors[name].map(
+              (err, i) =>
+                err?.message && (
+                  <p key={i} className="text-red-600 text-sm font-bold text-md">
+                     {err.message}
+                  </p>
+                )
+            )}
         </div>
       </div>
     );
@@ -58,7 +76,7 @@ const FormInput = ({ name, label, type = "text", as = "input", options = [], pla
         </label>
         <select
           {...register(name)}
-          className={`border-2 border-gray-400 w-full p-4 mt-2 rounded-lg focus:ring-1 focus:outline-none focus:border-[#132e13] ${errors? "border-red-500":"border-gray-300"}`}
+          className={`border-2 border-gray-400 w-full p-4 mt-2 rounded-lg focus:ring-1 focus:outline-none focus:border-[#132e13] ${showError ? "border-red-500" : "border-gray-300"}`}
         >
           <option value="">Select {label}</option>
           {options.map((opt) => (
@@ -67,10 +85,10 @@ const FormInput = ({ name, label, type = "text", as = "input", options = [], pla
             </option>
           ))}
         </select>
-        <div className="">
-        {errors[name] && (
-          <p className="text-red-600 text-sm mt-3 font-bold text-md">{errors[name].message}</p>
-        )}
+        <div>
+          {showError && (
+            <p className="text-red-600 text-sm mt-3 font-bold text-md">{errors[name]?.message}</p>
+          )}
         </div>
       </div>
     );
@@ -83,15 +101,15 @@ const FormInput = ({ name, label, type = "text", as = "input", options = [], pla
         {label} <span className="ml-1 text-red-600">*</span>
       </label>
       <input
-        {...register(name,type==="number"?{valueAsNumber:true}:{})}
+        {...register(name, type === "number" ? { valueAsNumber: true } : {})}
         type={type}
         placeholder={placeholder}
-        className={`border-2 border-gray-400 w-full p-4 mt-2 rounded-lg focus:ring-1 focus:outline-none focus:border-[#132e13] ${errors? "border-red-500":"border-gray-300"}`}
+        className={`border-2 border-gray-400 w-full p-4 mt-2 rounded-lg focus:ring-1 focus:outline-none focus:border-[#132e13] ${showError ? "border-red-500" : "border-gray-300"}`}
       />
       <div className="">
-      {errors[name] && (
-        <p className="text-red-600 text-sm mt-3 font-bold text-md">{errors[name].message}</p>
-      )}
+        {showError && (
+          <p className="text-red-600 text-sm mt-3 font-bold text-md">{errors[name]?.message}</p>
+        )}
       </div>
     </div>
   );

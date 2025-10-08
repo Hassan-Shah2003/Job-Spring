@@ -11,8 +11,8 @@ const JobSchema = yup.object({
     // STEP 2: Job Details
 
     description: yup.string().required("Job description is required").min(20, "Description should be at least 20 characters"),
-    responsibilities: yup.array().of(yup.string().required("Responsibilities are required")),
-    requirements: yup.array().of(yup.string().required("Requirements are required")),
+    responsibilities: yup.array().of(yup.string().trim().min(5,"Each responsibility must be at least 5 characters long").required("Responsibilities are required")).min(1,"At least one responsibility is required"),
+    requirements: yup.array().of(yup.string().trim().min(5, "Each requirment must be at least 5 characters long").required("Requirements are required")).min(1,"At least one requirement is required"),
     experienceLevel: yup.string().required("Please select an experience level"),
     educationLevel: yup.string().required("Please select an education level"),
     skills: yup.array().of(yup.string()).min(1, "Please add at least one skill"),
@@ -22,9 +22,9 @@ const JobSchema = yup.object({
 
     minSalary: yup.number().typeError("Minimum salary must be a number").required("Minimum salary is required"),
     maxSalary: yup.number().typeError("Maximum salary must be a number").required("Maximum salary is required").min(yup.ref("minSalary"), "Max salary must be greater than min salary"),
-    currency: yup.string("Currency is required"),
+    currency: yup.string().required("Currency is required"),
     negotiable: yup.boolean(),
-    perks: yup.array().of(yup.string()).min(1, "Select at least one perk"),
+    perks: yup.array().of(yup.string()).min(1, "Select at least one perk").required("Select at least one perk"),
     workSchedule: yup.string().required("Work schedule is required"),
 
     // STEP 4: Application Settings

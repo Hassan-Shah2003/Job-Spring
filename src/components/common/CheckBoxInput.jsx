@@ -2,7 +2,9 @@ import React from 'react'
 import { useFormContext } from 'react-hook-form'
 
 const CheckBoxInput = () => {
-  const { register, watch,formState: { errors } } = useFormContext()
+  const { register, watch, formState: { errors } } = useFormContext()
+
+  const showError = Boolean(errors?.perks);
   const perksOptions = [
     "Remote Work",
     "Health Insurance",
@@ -14,12 +16,9 @@ const CheckBoxInput = () => {
     <div>
       <div className='mb-5'>
         <div className='flex gap-2 items-center'>
-          <input {...register("negotiable")} type='checkbox' className={`w-4 h-4 ${errors? "border-red-500":"border-gray-300"}`}></input>
+          <input {...register("negotiable")} type='checkbox' className={`w-4 h-4 ${errors[name] ? "border-red-500" : "border-gray-300"}`}></input>
           <label>Salary is negotiable</label>
         </div>
-        {errors.negotiable && (
-          <p className="text-red-600 text-sm mt-2 font-bold text-md">{errors.perks.message}</p>
-        )}
       </div>
 
       <div className='mb-6'>
@@ -30,17 +29,18 @@ const CheckBoxInput = () => {
               <input
                 {...register("perks")}
                 value={perk}
-                className={`w-4 h-4 ${errors? "border-red-500":"border-gray-300"}`}
                 type='checkbox'
+                className={`w-4 h-4 ${errors.perks ? "border-red-500" : "border-gray-300"}`}
               />
               <label>{perk}</label>
-              {errors.perks && (
-                <p className="text-red-600 mt-2 font-bold text-md">{errors.perks.message}</p>
-              )}
             </div>
           ))}
 
+
         </div>
+      {showError && (
+        <p className="text-red-600 mt-2 font-bold text-md">{errors.perks?.message}</p>
+      )}
       </div>
     </div>
   )

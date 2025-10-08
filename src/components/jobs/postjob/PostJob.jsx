@@ -15,8 +15,8 @@ const PostJob = () => {
   const [completeStep, setcompleteStep] = useState([]);
 
   const methods = useForm({
-    "defaultValues":DefaultValues,
     resolver: yupResolver(JobSchema),
+    "defaultValues":DefaultValues,
     mode: "onChange", // real-time validation
   });
     const { handleSubmit, watch } = methods;

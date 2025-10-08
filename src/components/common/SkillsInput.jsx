@@ -3,23 +3,27 @@ import React, { useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 
 const SkillsInput = ({label,name}) => {
-    const{setValue,watch,formState:{ errors }}=useFormContext();
+  const{setValue,watch,trigger,formState:{ errors }}=useFormContext();
+
+  const skills = watch(name) || [];
+
+const showError = Boolean(errors?.[name]);
     const [currentSkills, setcurrentSkills] = useState('');
 
-      const skills = watch(name) || [];
-
-    const addSkills =()=>{
+    const addSkills =async()=>{
         if (currentSkills.trim() && !skills.includes(currentSkills.trim())) {
             const newSkill = [...skills,currentSkills.trim()];
             setValue(name,newSkill);
             setcurrentSkills('');
-        }
+            await trigger(name);
+          }
     }
 
-    const removeSkill =(removeIndex)=>{
+    const removeSkill =async(removeIndex)=>{
         const newSkill = skills.filter((_,index)=>index !==removeIndex)
         setValue(name,newSkill);
-    }
+        await trigger(name);
+      }
 
     const handleKeyPress =(e)=>{
         if (e.key==="Enter") {
@@ -29,7 +33,7 @@ const SkillsInput = ({label,name}) => {
     }
 
   return (
-    <div className='mb-4'>
+    <div className='mb-4 mt-4'>
       <label className='text-md font-medium'>
         {label}<span className='ml-1 text-red-600'>*</span>
       </label>
@@ -55,7 +59,7 @@ const SkillsInput = ({label,name}) => {
             ))}
           </div>
         ) : (
-          <p className="text-gray-500 text-sm"></p>
+          <p className="text-gray-500 text-sm">No skill Added</p>
         )}
       </div>
 
@@ -65,7 +69,7 @@ const SkillsInput = ({label,name}) => {
           value={currentSkills}
           onChange={(e) => setcurrentSkills(e.target.value)}
           onKeyDown={handleKeyPress}
-          className={`border-2 border-gray-400 border-r-0 w-full p-3 rounded-l-lg focus:ring-1 focus:outline-none focus:border-[#132e13] ${errors? "border-red-500":"border-gray-300"}`} 
+          className={`border-2 border-gray-400 border-r-0 w-full p-3 rounded-l-lg focus:ring-1 focus:outline-none focus:border-[#132e13] ${showError? "border-red-500":"border-gray-300"}`} 
           placeholder='Enter a skill'
         />
         <button 
@@ -75,7 +79,10 @@ const SkillsInput = ({label,name}) => {
         >
           Add
         </button>
-      </div>
+        </div>
+        {showError && (
+          <p className="text-red-600 text-sm mt-3 font-bold text-md">{errors[name]?.message}</p>
+        )}
     </div>
   )
 }

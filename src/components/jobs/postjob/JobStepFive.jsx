@@ -59,7 +59,7 @@ const JobStepFive = ({ onNext, onBack, showPrevious, isLastStep ,handleSubmit,on
                 </div>
               </div>
               <div>
-                <p className='font-extrabold text-2xl'><span>{formData.minSalary}</span> - <span>{formData.maxSalary}</span></p>
+                <p className='font-extrabold text-2xl'><span className='font-medium'>{formData.currency}</span><span>{formData.minSalary}</span> - <span className='font-medium'>{formData.currency}</span><span>{formData.maxSalary}</span></p>
                 <p className='text-right font-light text-xl text-gray-700'>per month</p>
               </div>
             </div>

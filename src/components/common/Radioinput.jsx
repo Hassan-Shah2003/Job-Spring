@@ -8,7 +8,8 @@ const Radioinput = ({radioOptions=[],name,label}) => {
     watch
   } = useFormContext();
     const selectedValue = watch(name);
-    
+  const hasError = (errors[name])
+   const showError = hasError && selectedValue?.trim()!=="";
     return (
       <div className='mb-6'>
         <label className="font-bold block mb-4">
@@ -30,7 +31,7 @@ const Radioinput = ({radioOptions=[],name,label}) => {
           ))}
           
         </div>
-        {errors.applyMethod && (
+        {showError && (
           <p className="text-red-600 text-sm mt-2">{errors.applyMethod.message}</p>
         )}
         
@@ -47,7 +48,7 @@ const Radioinput = ({radioOptions=[],name,label}) => {
               placeholder='https://...'
           
           />
-          {errors.applicationUrl && (
+          {showError && (
             <p className="text-red-600 text-sm mt-1">
               {errors.applicationUrl.message}
             </p>
