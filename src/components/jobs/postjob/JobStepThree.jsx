@@ -1,9 +1,9 @@
 import React from 'react'
-import ProTip from '../../common/ProTips'
-import FormFooter from '../../common/FormFooter'
+import ProTip from '../../common/tipsform/ProTips'
+import FormFooter from '../../common/FormFooter/FormFooter'
 import { useFormContext } from 'react-hook-form';
-import FormInput from '../../common/FormInput';
-import CheckBoxInput from '../../common/CheckBoxInput';
+import FormInput from '../../common/FormInputs/FormInput';
+import CheckBoxInput from '../../common/FormInputs/CheckBoxInput';
 
 const JobStepThree = ({ onNext, onBack }) => {
   const {

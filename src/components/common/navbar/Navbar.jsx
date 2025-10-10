@@ -1,5 +1,5 @@
 import React from 'react'
-import images from "../../assets/images/images.png";
+import images from "../../../assets/images/images.png";
 const Navbar = () => {
   return (
     <div className='body-color flex justify-between items-center'>

@@ -2,11 +2,11 @@ import { Eye, MapPin, Rocket } from 'lucide-react'
 import React from 'react'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBuilding, faCheckCircle, faCircleCheck, faClock, faCog, faCogs, faEye, faGift, faGraduationCap, faListCheck, faLocation, faLocationDot, faScrewdriver, faScrewdriverWrench, faStar } from "@fortawesome/free-solid-svg-icons";
-import FormFooter from '../../common/FormFooter';
+import FormFooter from '../../common/FormFooter/FormFooter';
 import { useFormContext } from 'react-hook-form';
 
 
-const JobStepFive = ({ onNext, onBack, showPrevious, isLastStep ,handleSubmit,onSubmit }) => {
+const JobStepFive = ({ onNext, onBack, showPrevious, isLastStep, handleSubmit, onSubmit }) => {
   // console.log("✅ JobStepFive Rendered");
   const { getValues, watch } = useFormContext();
 
@@ -80,7 +80,7 @@ const JobStepFive = ({ onNext, onBack, showPrevious, isLastStep ,handleSubmit,on
             </div>
             <ul className="text-gray-700 space-y-3" id="preview-responsibilities">
               {formData.responsibilities?.length > 0 ? (
-                formData.responsibilities.filter((res)=>res.trim()!=="").map((item, index) => (
+                formData.responsibilities.filter((res) => res.trim() !== "").map((item, index) => (
                   <li key={index} className="flex items-start">
                     <FontAwesomeIcon icon={faCheckCircle} className="text-green-500 mr-3 mt-1"></FontAwesomeIcon>
                     <span>{item}</span>
@@ -101,7 +101,7 @@ const JobStepFive = ({ onNext, onBack, showPrevious, isLastStep ,handleSubmit,on
             </div>
             <ul className="text-gray-700 space-y-3" id="preview-responsibilities">
               {formData.requirements?.length > 0 ? (
-                formData.requirements.filter((req)=>req.trim()!=="").map((elem, index) => (
+                formData.requirements.filter((req) => req.trim() !== "").map((elem, index) => (
                   <li key={index} className="flex items-start">
                     <FontAwesomeIcon icon={faStar} className="text-yellow-500 mr-3 mt-1"></FontAwesomeIcon>
                     <span>{elem}</span>

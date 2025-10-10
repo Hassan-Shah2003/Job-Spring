@@ -4,12 +4,15 @@ import JobStepTwo from './JobStepTwo'
 import JobStepThree from './JobStepThree'
 import JobStepFour from './JobStepFour'
 import JobStepFive from './JobStepFive'
-import Navbar from '../../common/Navbar'
-import CustomStepper from '../../common/SteeperNav.jsx'
+import Navbar from '../../common/navbar/Navbar.jsx'
+import CustomStepper from '../../common/steepernav/SteeperNav.jsx'
 import { FormProvider, useForm} from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup";
-import DefaultValues from "../../common/DefaultValues.jsx"
+import DefaultValues from "../../common/defaultValues/DefaultValues.jsx"
 import JobSchema from "../../../schemas/JobSchema.jsx"
+import { useMemo } from "react";
+import supaBase from "../../../services/supabaseClient.js"
+
 const PostJob = () => {
   const [ActiveStep, setActiveStep] = useState(0);
   const [completeStep, setcompleteStep] = useState([]);
@@ -20,37 +23,42 @@ const PostJob = () => {
     mode: "onChange", // real-time validation
   });
     const { handleSubmit, watch } = methods;
-
+    const stepField = useMemo(()=>
+      [["title", "category", "type", "location", "openings"],
+        ["description", "responsibilities", "requirements", "experienceLevel",      "educationLevel", "skills"],
+        ["minSalary", "maxSalary", "currency", "perks", "workSchedule"],
+        ["applyMethod", "applicationUrl", "contactEmail", "applicationDeadline", "visibility"],
+      ],[]
+  );
   const nextStep = async () => {
-      let currentFields = [];
-    if (ActiveStep === 0) {
-    currentFields = ["title", "category", "type", "location", "openings"];
-  } else if (ActiveStep === 1) {
-    currentFields = ["description", "responsibilities", "requirements", "experienceLevel", "educationLevel", "skills"];
-  } else if (ActiveStep === 2) {
-    currentFields = ["minSalary", "maxSalary", "currency", "perks", "workSchedule"];
-  } else if (ActiveStep === 3) {
-    currentFields = ["applyMethod", "applicationUrl", "contactEmail", "applicationDeadline", "visibility"];
-  }
+      let currentFields = stepField[ActiveStep]|| [];
     const valid = await methods.trigger(currentFields);
       console.log("🔍 Validating:", currentFields, "Result:", valid);
 
-   if (valid) {
-    console.log("✅ Validation passed, going next");
-    if (!completeStep.includes(ActiveStep)) {
-      setcompleteStep([...completeStep, ActiveStep]);
-    }
-    setActiveStep((prev) => prev + 1);
-  } else {
-    console.log("❌ Validation failed, staying on same step");
-  }    
+   if (!valid){ 
+    // console.log("❌ Validation failed, staying on same step");
+    return;
   }
+    // console.log("✅ Validation passed, going next");
+    setcompleteStep((prev)=>
+      prev.includes(ActiveStep)?prev:[...prev, ActiveStep]);
+      setActiveStep((prev) => prev + 1);
+  };
   const BackStep = () => {
     if (ActiveStep > 0) setActiveStep(ActiveStep - 1)
   }
- const onSubmit = (data) => {
-    console.log("✅ Job Data:", data);
+ const onSubmit = async (data) => {
+    // console.log("✅ Job Data:", data);
+
+    const {error} = await supaBase.from("Jobs").insert([data]);
+    if(error) {
+      console.error("❌ Supabase Error:", error.message);
+      alert("Failed to post job. Please try again!");
+    } else {
+      alert("🎉 Job successfully posted!");
+      console.log("✅ Job added to Supabase")
   };
+}
   const step = [
     <JobStepOne onNext={nextStep} onBack={BackStep} showPrevious={false}></JobStepOne>,
     <JobStepTwo onNext={nextStep} onBack={BackStep} showPrevious={true}></JobStepTwo>,

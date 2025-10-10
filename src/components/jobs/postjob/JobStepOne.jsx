@@ -1,8 +1,8 @@
 import React from "react";
 import { useFormContext } from "react-hook-form";
-import FormInput from "../../common/FormInput";
-import ProTip from "../../common/ProTips";
-import FormFooter from "../../common/FormFooter";
+import FormInput from "../../common/FormInputs/FormInput";
+import ProTip from "../../common/tipsform/ProTips";
+import FormFooter from "../../common/FormFooter/FormFooter";
 
 const JobStepOne = ({ onNext, onBack }) => {
   return (
@@ -64,8 +64,8 @@ const JobStepOne = ({ onNext, onBack }) => {
         </div>
       </div>
       <div className="mt-10">
-      <FormFooter type="button" onNext={onNext} onBack={onBack} showPrevious={false} />
-    </div>
+        <FormFooter type="button" onNext={onNext} onBack={onBack} showPrevious={false} />
+      </div>
     </div>
 
   );

@@ -1,9 +1,9 @@
 import React from 'react'
-import Radioinput from '../../common/Radioinput'
-import FormInput from '../../common/FormInput'
-import FormFooter from '../../common/FormFooter'
+import Radioinput from '../../common/FormInputs/Radioinput'
+import FormInput from '../../common/FormInputs/FormInput'
+import FormFooter from '../../common/FormFooter/FormFooter'
 
-const JobStepFour = ({onNext,onBack}) => {
+const JobStepFour = ({ onNext, onBack }) => {
   return (
     <div>
       <div>
@@ -42,7 +42,7 @@ const JobStepFour = ({onNext,onBack}) => {
       </div>
 
       <div className='mt-10'>
-        <FormFooter   type="button" onNext={onNext} onBack={onBack} showPrevious={true}></FormFooter>
+        <FormFooter type="button" onNext={onNext} onBack={onBack} showPrevious={true}></FormFooter>
       </div>
     </div>
   )

@@ -22,6 +22,7 @@
     "@material-tailwind/react": "^3.0.0-beta.24",
     "@mui/icons-material": "^7.3.2",
     "@mui/material": "^7.3.2",
+    "@supabase/supabase-js": "^2.75.0",
     "@tailwindcss/vite": "^4.1.13",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

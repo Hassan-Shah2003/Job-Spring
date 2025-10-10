@@ -1,13 +1,13 @@
 import React from "react";
 import { useFormContext } from "react-hook-form";
-import FormInput from "../../common/FormInput";
-import ProTip from "../../common/ProTips";
-import FormFooter from "../../common/FormFooter";
-import SkillsInput from "../../common/SkillsInput";
+import FormInput from "../../common/FormInputs/FormInput";
+import ProTip from "../../common/tipsform/ProTips";
+import FormFooter from "../../common/FormFooter/FormFooter";
+import SkillsInput from "../../common/FormInputs/SkillsInput";
 
 const JobStepTwo = ({ onNext, onBack, showPrevious }) => {
   console.log("jobstep2");
-  
+
   return (
     <div>
       <h1 className="text-xl font-bold">Job Details</h1>
@@ -33,32 +33,32 @@ const JobStepTwo = ({ onNext, onBack, showPrevious }) => {
           as="textarea"
           placeholder={"List requirements (one per line)"}
         />
-      </div> 
+      </div>
       <div className="grid grid-cols-2 gap-3">
-      <FormInput
-        name="experienceLevel"
-        label="Experience Level"
-        as="select"
-        options={[
-          "Entry Level (0-2 years)",
-          "Mid Level (3-5 years)",
-          "Senior Level (5+ years)",
-          "Others",
-        ]}
-      />
+        <FormInput
+          name="experienceLevel"
+          label="Experience Level"
+          as="select"
+          options={[
+            "Entry Level (0-2 years)",
+            "Mid Level (3-5 years)",
+            "Senior Level (5+ years)",
+            "Others",
+          ]}
+        />
 
-      <FormInput
-        name="educationLevel"
-        label="Education Requirement (optional)"
-        as="select"
-        options={[
-          "High School Diploma",
-          "Associate Degree",
-          "Bachelor's Degree",
-          "Master's Degree",
-          "PhD",
-        ]}
-      />
+        <FormInput
+          name="educationLevel"
+          label="Education Requirement (optional)"
+          as="select"
+          options={[
+            "High School Diploma",
+            "Associate Degree",
+            "Bachelor's Degree",
+            "Master's Degree",
+            "PhD",
+          ]}
+        />
       </div>
       <SkillsInput
         name="skills"
@@ -73,9 +73,9 @@ const JobStepTwo = ({ onNext, onBack, showPrevious }) => {
           message="Be specific with your job title to attract the right candidates."
         />
       </div>
-        <div className="mt-10">
-      <FormFooter type="button" onNext={onNext} onBack={onBack} showPrevious={true} />
-          </div>
+      <div className="mt-10">
+        <FormFooter type="button" onNext={onNext} onBack={onBack} showPrevious={true} />
+      </div>
     </div>
   );
 };
