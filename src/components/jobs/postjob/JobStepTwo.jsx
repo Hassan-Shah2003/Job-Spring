@@ -34,7 +34,7 @@ const JobStepTwo = ({ onNext, onBack, showPrevious }) => {
           placeholder={"List requirements (one per line)"}
         />
       </div>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <FormInput
           name="experienceLevel"
           label="Experience Level"

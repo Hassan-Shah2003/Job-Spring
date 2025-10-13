@@ -3,9 +3,10 @@ import PostJob from './components/jobs/postjob/PostJob'
 
 const App = () => {
   return (
-<>
-    <PostJob></PostJob>
-</>
+    <>
+      <PostJob></PostJob>
+      {/* <JobList /> */}
+    </>
   )
 }
 
