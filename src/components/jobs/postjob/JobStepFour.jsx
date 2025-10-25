@@ -1,4 +1,3 @@
-import React from 'react'
 import Radioinput from '../../common/FormInputs/Radioinput'
 import FormInput from '../../common/FormInputs/FormInput'
 import FormFooter from '../../common/FormFooter/FormFooter'
