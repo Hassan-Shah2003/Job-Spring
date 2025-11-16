@@ -10,7 +10,8 @@ const CheckBoxInput = () => {
     "Health Insurance",
     "Paid Leave",
     "Flexible Hours",
-    "Performance Bonus"
+    "Performance Bonus",
+    // "Mark this job as Featured?"
   ];
   return (
     <div>

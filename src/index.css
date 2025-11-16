@@ -1,1 +1,26 @@
 @import "tailwindcss";
+.custom-scroll::-webkit-scrollbar {
+  display: none;
+}
+.custom-scroll {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+/* Shimmer animation for BigJobLoader */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(to right, rgba(255,255,255,0), rgba(255,255,255,0.5), rgba(255,255,255,0));
+  transform: translateX(-100%);
+  animation: shimmer 1.5s infinite;
+  border-radius: inherit; /* keep rounded corners */
+}

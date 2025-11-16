@@ -79,7 +79,7 @@ const FormInput = ({ name, label, type = "text", as = "input", options = [], pla
           className={`border-2 border-gray-400 w-full p-4 mt-2 rounded-lg focus:ring-1 focus:outline-none focus:border-[#132e13] ${showError ? "border-red-500" : "border-gray-300"}`}
         >
           <option value="">Select {label}</option>
-          {options.map((opt) => (
+          {[...new Set(options)].map((opt) => (
             <option key={opt} value={opt}>
               {opt}
             </option>

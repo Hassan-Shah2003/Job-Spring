@@ -19,7 +19,7 @@ import {
 import FormFooter from "../../common/FormFooter/FormFooter";
 import { useFormContext } from "react-hook-form";
 
-const JobStepFive = ({ onNext, onBack, showPrevious, isLastStep, handleSubmit, onSubmit }) => {
+const JobStepFive = ({ onNext, onBack,handleCancel, showPrevious, isLastStep, handleSubmit, onSubmit,previousLoading, publishing }) => {
   const { getValues } = useFormContext();
   const formData = getValues();
 
@@ -58,7 +58,7 @@ const JobStepFive = ({ onNext, onBack, showPrevious, isLastStep, handleSubmit, o
             <p className="inline-flex items-center justify-center bg-[#284A3A] text-white px-5 py-2.5 rounded-full shadow-md text-base sm:text-lg font-semibold">
               <span className="mr-1">{formData.currency}</span>
               <span>{formData.minSalary}</span>
-              <span className="mx-1">-</span> 
+              <span className="mx-1">-</span>
               <span className="mr-1">{formData.currency}</span>
               <span>{formData.maxSalary}</span>
             </p>
@@ -100,7 +100,7 @@ const JobStepFive = ({ onNext, onBack, showPrevious, isLastStep, handleSubmit, o
                   </div>
                 </div>
               </div>
-{/* 
+              {/* 
               <div className="min-w-[150px] text-right">
                 <p className="font-extrabold text-lg sm:text-xl inline-flex items-center border border-[#d1e0d9] bg-gradient-to-br from-[#244034] to-[#2a4b3c] text-white px-4 py-2 rounded-full shadow-md">
                   <span>{formData.currency}</span>
@@ -193,38 +193,38 @@ const JobStepFive = ({ onNext, onBack, showPrevious, isLastStep, handleSubmit, o
         <div className="space-y-8">
           {/* Benefits */}
           {/* RIGHT SIDE — Additional Info */}
-<div className="space-y-8">
-  {/* Benefits */}
-  <div className="border-2 p-6 border-gray-200 rounded-lg shadow-lg hover:scale-[1.02] transition-transform w-full">
-    <div className="flex items-center gap-2 mb-3">
-      <FontAwesomeIcon icon={faGift} />
-      <h2 className="text-xl font-bold">Benefits & Perks</h2>
-    </div>
+          <div className="space-y-8">
+            {/* Benefits */}
+            <div className="border-2 p-6 border-gray-200 rounded-lg shadow-lg hover:scale-[1.02] transition-transform w-full">
+              <div className="flex items-center gap-2 mb-3">
+                <FontAwesomeIcon icon={faGift} />
+                <h2 className="text-xl font-bold">Benefits & Perks</h2>
+              </div>
 
-    <div className="flex flex-wrap">
-      {formData.perks?.length ? (
-        formData.perks.map((perk, index) => (
-          <span
-            key={index}
-            className="inline-flex items-center border border-[#d1e0d9] bg-gradient-to-br from-[#244034] to-[#2a4b3c] text-white px-3 py-2 rounded-full m-1 text-sm font-medium shadow-md hover:bg-green-700 hover:scale-105 transition-transform"
-          >
-            {perk}
-          </span>
-        ))
-      ) : (
-        <p className="italic text-gray-500">No perks added</p>
-      )}
-    </div>
+              <div className="flex flex-wrap">
+                {formData.perks?.length ? (
+                  formData.perks.map((perk, index) => (
+                    <span
+                      key={index}
+                      className="inline-flex items-center border border-[#d1e0d9] bg-gradient-to-br from-[#244034] to-[#2a4b3c] text-white px-3 py-2 rounded-full m-1 text-sm font-medium shadow-md hover:bg-green-700 hover:scale-105 transition-transform"
+                    >
+                      {perk}
+                    </span>
+                  ))
+                ) : (
+                  <p className="italic text-gray-500">No perks added</p>
+                )}
+              </div>
 
-    {/* 💬 Salary Negotiable */}
-    {formData.negotiable && (
-      <div className="mt-4 flex items-center gap-2 bg-green-50 border border-green-300 text-green-700 px-3 py-2 rounded-lg shadow-sm">
-        <FontAwesomeIcon icon={faMoneyBillWave} className="text-green-600" />
-        <span className="font-semibold">Salary is negotiable</span>
-      </div>
-    )}
-  </div>
-</div>
+              {/* 💬 Salary Negotiable */}
+              {formData.negotiable && (
+                <div className="mt-4 flex items-center gap-2 bg-green-50 border border-green-300 text-green-700 px-3 py-2 rounded-lg shadow-sm">
+                  <FontAwesomeIcon icon={faMoneyBillWave} className="text-green-600" />
+                  <span className="font-semibold">Salary is negotiable</span>
+                </div>
+              )}
+            </div>
+          </div>
 
 
           {/* Application Settings */}
@@ -248,27 +248,31 @@ const JobStepFive = ({ onNext, onBack, showPrevious, isLastStep, handleSubmit, o
 
           {/* Publish Box */}
           <div className="border-2 p-6 rounded-3xl bg-[#284A3A] text-white shadow-lg hover:scale-[1.02] transition-transform">
-            <h3 className="text-lg font-black mb-2">Ready to Publish?</h3>
+            <h3 className="text-lg font-black mb-2">You’re Almost There 🚀</h3>
             <p className="text-sm font-medium">
-              Your job will be visible to thousands of professionals.
+              Just review your details once — your listing is about to reach thousands of job seekers!
             </p>
-            <div className="flex flex-col gap-2 mt-3 text-sm sm:text-base">
-              <label className="flex items-center gap-2">
-                <input type="checkbox" className="w-5 h-5" />
-                <span>I confirm all information is accurate</span>
-              </label>
-              <label className="flex items-center gap-2">
-                <input type="checkbox" className="w-5 h-5" />
-                <span>This listing complies with policies</span>
-              </label>
+
+            <div className="mt-4 space-y-3">
+              <div className="flex items-center gap-2">
+                <span className="text-green-400">✅</span>
+                <span>Job details completed</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-green-400">✅</span>
+                <span>Requirements added</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-green-400">✅</span>
+                <span>Application info verified</span>
+              </div>
             </div>
-            <button
-              onClick={handleSubmit(onSubmit)}
-              className="flex items-center justify-center gap-2 mt-5 border-2 rounded-full p-3 bg-white text-black font-bold w-full hover:bg-green-100 transition-all"
-            >
-              <Rocket /> Publish Job Listing
-            </button>
+
+            <div className="mt-6 p-3 bg-green-700 rounded-xl text-center font-semibold">
+              🎉 Great! You’re all set to publish your job post.
+            </div>
           </div>
+
         </div>
       </div>
 
@@ -279,6 +283,9 @@ const JobStepFive = ({ onNext, onBack, showPrevious, isLastStep, handleSubmit, o
           onBack={onBack}
           showPrevious={true}
           isLastStep={true}
+          handleCancel={handleCancel}
+          previousLoading={previousLoading}
+          publishing={publishing}
         />
       </div>
     </div>

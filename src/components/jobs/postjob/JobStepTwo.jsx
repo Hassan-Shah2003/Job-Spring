@@ -5,7 +5,7 @@ import ProTip from "../../common/tipsform/ProTips";
 import FormFooter from "../../common/FormFooter/FormFooter";
 import SkillsInput from "../../common/FormInputs/SkillsInput";
 
-const JobStepTwo = ({ onNext, onBack, showPrevious }) => {
+const JobStepTwo = ({ onNext, onBack, handleCancel, showPrevious, previousLoading, nextLoading }) => {
   console.log("jobstep2");
 
   return (
@@ -40,10 +40,12 @@ const JobStepTwo = ({ onNext, onBack, showPrevious }) => {
           label="Experience Level"
           as="select"
           options={[
-            "Entry Level (0-2 years)",
-            "Mid Level (3-5 years)",
-            "Senior Level (5+ years)",
-            "Others",
+            "Intern",
+    "Entry-Level (0-1 years)",
+    "Junior (1-3 years)",
+    "Mid-Level (3-5 years)",
+    "Senior (5-10 years)",
+    "Lead / Manager (10+ years)",
           ]}
         />
 
@@ -52,11 +54,13 @@ const JobStepTwo = ({ onNext, onBack, showPrevious }) => {
           label="Education Requirement (optional)"
           as="select"
           options={[
-            "High School Diploma",
-            "Associate Degree",
-            "Bachelor's Degree",
-            "Master's Degree",
-            "PhD",
+            "High School / Secondary",
+            "Diploma / Associate Degree",
+            "Bachelor’s Degree",
+            "Master’s Degree",
+            "PhD / Doctorate",
+            "Certification / Professional Training",
+            "Any",
           ]}
         />
       </div>
@@ -74,7 +78,7 @@ const JobStepTwo = ({ onNext, onBack, showPrevious }) => {
         />
       </div>
       <div className="mt-10">
-        <FormFooter type="button" onNext={onNext} onBack={onBack} showPrevious={true} />
+        <FormFooter type="button" nextLoading={nextLoading} previousLoading={previousLoading} handleCancel={handleCancel} onNext={onNext} onBack={onBack} showPrevious={true} />
       </div>
     </div>
   );

@@ -28,6 +28,7 @@ const DefaultValues = {
   contactEmail: "",
   applicationDeadline: "",
   visibility: "Public - Listed on job board",
+  is_featured:false,
 };
 
 export default DefaultValues;

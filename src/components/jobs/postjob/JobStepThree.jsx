@@ -5,7 +5,7 @@ import { useFormContext } from 'react-hook-form';
 import FormInput from '../../common/FormInputs/FormInput';
 import CheckBoxInput from '../../common/FormInputs/CheckBoxInput';
 
-const JobStepThree = ({ onNext, onBack }) => {
+const JobStepThree = ({ onNext, handleCancel, onBack, previousLoading, nextLoading }) => {
   const {
     register,
     formState: { errors },
@@ -32,11 +32,12 @@ const JobStepThree = ({ onNext, onBack }) => {
           label="Currency"
           as="select"
           options={[
-            "$",
-            "€",
-            "£",
-            "₨",
-            "₹",
+            "PKR",
+            "USD",
+            "EUR",
+            "GBP",
+            "AED",
+            "INR",
           ]}
         />
       </div>
@@ -47,17 +48,19 @@ const JobStepThree = ({ onNext, onBack }) => {
           label="Work Schedule"
           as="select"
           options={[
-            "Select schedule",
+            // "Select schedule",
             "Day shift",
             "Night shift",
             "Flexible",
             "Shift work",
+            "Remote",
+            "Hybrid",
           ]}
         />
 
       </div>
       <div className='mt-10'>
-        <FormFooter type="button" onNext={onNext} onBack={onBack} showPrevious={true}></FormFooter>
+        <FormFooter type="button" nextLoading={nextLoading} previousLoading={previousLoading} handleCancel={handleCancel} onNext={onNext} onBack={onBack} showPrevious={true}></FormFooter>
       </div>
     </div>
   )

@@ -5,7 +5,7 @@ import ProTip from "../../common/tipsform/ProTips";
 import FormFooter from "../../common/FormFooter/FormFooter";
 import CategoryOptions from "../../common/CategoryOptions/CategoryOptions";
 
-const JobStepOne = ({ onNext, onBack }) => {
+const JobStepOne = ({ onNext, handleCancel, onBack, nextLoading }) => {
   return (
     <div>
       <h1 className="text-xl font-bold">Basic Job Information</h1>
@@ -29,11 +29,12 @@ const JobStepOne = ({ onNext, onBack }) => {
           label="Job Type"
           as="select"
           options={[
-            "Full-time",
-            "Part-time",
+            "Full-Time",
+            "Part-Time",
             "Contract",
             "Internship",
             "Remote",
+            "Freelance",
           ]}
         />
 
@@ -58,7 +59,7 @@ const JobStepOne = ({ onNext, onBack }) => {
         </div>
       </div>
       <div className="mt-10">
-        <FormFooter type="button" onNext={onNext} onBack={onBack} showPrevious={false} />
+        <FormFooter type="button" nextLoading={nextLoading} onNext={onNext} onBack={onBack} showPrevious={false} handleCancel={handleCancel} />
       </div>
     </div>
 
