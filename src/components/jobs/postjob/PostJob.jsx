@@ -10,7 +10,7 @@ import CustomStepper from '../../common/steepernav/SteeperNav.jsx'
 import { FormProvider, useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup";
 import DefaultValues from "../../common/defaultValues/DefaultValues.jsx"
-import JobSchema from "../../../utils/schemas/JobSchema.jsx"
+import JobSchema from "../../../services/utils/schemas/JobSchema.jsx"
 import { useMemo } from "react";
 import supaBase from "../../../services/supabaseClient.js"
 import { Link, useNavigate } from "react-router-dom";
@@ -33,7 +33,7 @@ const PostJob = () => {
     "defaultValues": DefaultValues,
     mode: "onChange", // real-time validation
   });
-  const { handleSubmit,clearErrors,reset, watch } = methods;
+  const { handleSubmit, clearErrors, reset, watch } = methods;
   const stepField = useMemo(() =>
     [["title", "category", "type", "location", "openings"],
     ["description", "responsibilities", "requirements", "experienceLevel", "educationLevel", "skills"],
@@ -70,24 +70,24 @@ const PostJob = () => {
   }
 
   const handleCancel = () => {
-  Swal.fire({
-    title: "Cancel Job Posting?",
-    text: "Are you sure you want to cancel this job post?",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#d33",
-    cancelButtonColor: "#3085d6",
-    confirmButtonText: "Yes, cancel it!"
-  }).then((result) => {
-    if (result.isConfirmed) {
-      clearErrors();   
-      reset();          
-      toast("Job posting cancelled", { icon: "🚫" });
+    Swal.fire({
+      title: "Cancel Job Posting?",
+      text: "Are you sure you want to cancel this job post?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, cancel it!"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        clearErrors();
+        reset();
+        toast("Job posting cancelled", { icon: "🚫" });
 
-      setTimeout(() => navigate("/jobs"), 800);
-    }
-  });
-};
+        setTimeout(() => navigate("/jobs"), 800);
+      }
+    });
+  };
 
   const onSubmit = async (data) => {
     // console.log("✅ Job Data (before insert):", data);
@@ -168,14 +168,14 @@ const PostJob = () => {
         <FormProvider {...methods}>
           <div className='mt-20 px-10'>
             <div className="mb-5">
-              {ActiveStep===0 &&(<Link
+              {ActiveStep === 0 && (<Link
                 to="/"
                 className="flex items-center gap-2 text-white hover:text-amber-300"
               >
                 <ArrowLeftCircle size={26} />
                 <span className="text-xl">Back</span>
               </Link>
-            )}
+              )}
             </div>
             <div className=' bg-white p-8 shadow-[0_10px_30px_rgba(0,0,0,0.08)] rounded-lg'>
               <CustomStepper activeStep={ActiveStep}></CustomStepper>

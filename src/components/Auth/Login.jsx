@@ -3,7 +3,7 @@ import { useAuth } from "../Auth/AuthContext";
 import { Link, useActionData, useNavigate } from "react-router-dom";
 import images from "../../assets/images/images.png";
 import toast, { Toaster } from "react-hot-toast";
-import { loginSchema } from "../../utils/schemas/LoginSchema"
+import { loginSchema } from "../../services/utils/schemas/LoginSchema"
 const Login = () => {
   const { signInUser } = useAuth();
   const navigate = useNavigate();

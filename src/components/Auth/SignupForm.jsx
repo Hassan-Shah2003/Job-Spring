@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import images from "../../assets/images/images.png"
-import SignupSchema from "../../utils/schemas/SignUpSchema";
+import SignupSchema from "../../services/utils/schemas/SignUpSchema";
 import supaBase from "../../services/supabaseClient";
 import { useAuth } from "./AuthContext";
 import AnimatedToast from "../common/loader/AnimatedToast";
@@ -12,7 +12,7 @@ const SignupForm = () => {
     const [toasts, setToasts] = useState([]);
     const [errors, setErrors] = useState({});
     const [formData, setFormData] = useState({
-        
+
         fullName: "",
         email: "",
         password: "",
@@ -88,10 +88,10 @@ const SignupForm = () => {
                 })
                 setTimeout(() => {
                     navigate("/Login"); // ya koi bhi page jahan redirect karna hai
-                },1500);
+                }, 1500);
             }
-            
-             else {
+
+            else {
                 toast.error(`${error.message}`, "error");
             }
         }
@@ -240,9 +240,9 @@ const SignupForm = () => {
                         )}
                         {loading ? "Signing Up..." : "Sign Up"}
                     </button>
-                        <div className="text-center pt-2">
+                    <div className="text-center pt-2">
                         <Link to={"/login"} className="text-[#98ffcc] font-semibold hover:underline">Alerady Account</Link>
-                        </div>
+                    </div>
                 </form>
             </div>
             {/* <AnimatedToast
