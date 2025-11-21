@@ -13,7 +13,7 @@ const ProfilePage = () => {
   const [loading, setLoading] = useState(true);
   const [errors, setErrors] = useState({});
   const { user, setUser } = useAuth();
-  // console.log();
+  console.log();
   const role = user.user_metadata.role
   const [userData, setUserData] = useState({
     name: "",
@@ -686,7 +686,7 @@ const addArrayItem = (arrayName) => {
 
                     {/* Name + Title */}
                     <h1 className="text-2xl font-bold text-center mt-4 mb-1">
-                      {user?.user_metadata?.fullName || "Your Name"}
+                      {user?.user_metadata?.companyName || user?.user_metadata?.fullName || "Your Name"}
                     </h1>
                     <p className="text-blue-100 text-center mb-1">{userData.title || "Your Title"}</p>
                     <p className="text-sm text-blue-200 text-center italic">
