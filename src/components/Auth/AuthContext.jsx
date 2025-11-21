@@ -8,6 +8,9 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [role, setRole] = useState(null); // ✅ Add role
+  let emailQueue = [];
+  let isProcessingQueue = false;
+
   // const [session, setSession] = useState(null);
   const savedData = localStorage.getItem("signup_formData");
   const parsedData = JSON.parse(savedData); // Convert string back to object
@@ -21,6 +24,31 @@ export const AuthProvider = ({ children }) => {
       toast.success(message, { position: "top-center" });
     }
   };
+
+      const processEmailQueue = async () => {
+  if (emailQueue.length === 0) {
+    isProcessingQueue = false;
+    return;
+  }
+
+  isProcessingQueue = true;
+
+  const emailData = emailQueue.shift(); // first email
+  try {
+    // Example: Supabase email verification
+    await supaBase.auth.api.sendVerificationEmail(emailData.userEmail);
+
+    console.log("Email sent to", emailData.userEmail);
+  } catch (err) {
+    console.error("Failed to send email:", err);
+    // Optional: re-add to queue for retry
+    emailQueue.push(emailData);
+  }
+
+  // Delay before next email (1-2 seconds)
+  setTimeout(processEmailQueue, 1000);
+};
+
   // const updateAvatar = (url) => {
   //   setAvatar(url);
   //   localStorage.setItem("avatar", url);
@@ -71,6 +99,7 @@ export const AuthProvider = ({ children }) => {
 
     getSession();
 
+
     // ✅ Listen to auth state changes
     const { data: { subscription } } = supaBase.auth.onAuthStateChange(
       async (_event, session) => {
@@ -119,12 +148,18 @@ export const AuthProvider = ({ children }) => {
     });
     console.log(data);
     if (error) throw error;
-    return data;
-    
-    } catch (error) {
-      throw error;
+    emailQueue.push({ userEmail: email });
+      if (!isProcessingQueue) processEmailQueue();
+
+      showToast("Signup successful! Please verify your email.");
+      return data;
+
+      // return data;
+    } catch (err) {
+      showToast(err.message, "error");
+      throw err;
+      
     }
-   
    
    
    
@@ -245,7 +280,7 @@ export const AuthProvider = ({ children }) => {
         type: "signup",
         email,
         options: {
-          emailRedirectTo: "http://localhost:5173/confirm-email",
+          emailRedirectTo: "https://career-spring.netlify.app/jobs",
         },
       });
 
