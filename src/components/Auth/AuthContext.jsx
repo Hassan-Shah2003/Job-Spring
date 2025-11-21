@@ -142,7 +142,6 @@ export const AuthProvider = ({ children }) => {
           location: formData.location,
           about: formData.about,
         },
-        // emailRedirectTo: "http://localhost:5173/jobs", //local
         emailRedirectTo: "https://career-spring.netlify.app/jobs",//prod
       },
     });
