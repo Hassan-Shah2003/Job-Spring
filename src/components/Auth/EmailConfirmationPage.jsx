@@ -1,45 +1,42 @@
 import React, { useState } from 'react';
-import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import toast from 'react-hot-toast';
 import { ArrowLeftCircle } from 'lucide-react';
 
 const EmailConfirmationPage = () => {
-  const navigate = useNavigate(); // ⚡ useNavigate hook
-  const location = useLocation()
-  const locationState = location?.state
-  console.log("locationState-----------", locationState);
-
+  const navigate = useNavigate();
+  const location = useLocation();
   const { resendEmailVerification } = useAuth();
-  const savedData = localStorage.getItem("signup_formData");
-  const parsedData = JSON.parse(savedData) || {}; // Convert string back to object
-  // const [emailEditLoading,setEmailEditLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
-  console.log(parsedData);
+
+  const locationState = location?.state;
+  const userEmail = locationState?.email;
 
   const handleResendEmail = async () => {
+    if (!userEmail) {
+      toast.error("No email found to resend verification");
+      return;
+    }
+
     setResendLoading(true);
     try {
-      await resendEmailVerification(locationState?.email);
-      toast.success("Verification email resent!");
+      const success = await resendEmailVerification(userEmail);
+      if (success) {
+        toast.success("Verification email resent!");
+      } else {
+        toast.error("Failed to resend email!");
+      }
     } catch (error) {
       toast.error("Failed to resend email!");
     } finally {
       setResendLoading(false);
     }
   };
-  // const emailEditHandler = () => {
-  //   setEmailEditLoading(true);
-  //     navigate("/signup")
-  //   // setEmailEditLoading(false);
-
-  // }
 
   const handleBack = () => {
-    localStorage.removeItem("signup_formData"); // old email remove
-    navigate("/signup", { replace: true }); // replace = no history glitch
+    navigate("/signup", { replace: true });
   };
-
 
   return (
     <>
@@ -72,7 +69,7 @@ const EmailConfirmationPage = () => {
               </div>
               <h2 className="text-xl font-semibold text-gray-800">Check Your Inbox</h2>
               <p className="text-gray-600 mt-2">
-                We've sent a confirmation email to your <span className='font-black'>{locationState?.email || "your email"}</span>
+                We've sent a confirmation email to <span className='font-black'>{userEmail || "your email"}</span>
               </p>
             </div>
 
@@ -83,31 +80,24 @@ const EmailConfirmationPage = () => {
             </div>
 
             <div className="space-y-4">
-              <button className={`w-full items-center flex justify-center gap-2  bg-[#244034] hover:bg-[#1a3328] text-white font-medium py-3 px-4 rounded-lg transition duration-200 cursor-pointer ${resendLoading ? "opacity-60 cursor-not-allowed pointer-events-none" : ""}`} disabled={resendLoading}
-                onClick={handleResendEmail}>
-                {/* Resend Confirmation Email */}
-
-                {/* {loading ? "Signing Up..." : "Sign Up"} */}
-                {resendLoading ? "resending..." : "Resend Confirmation Email"}
+              <button 
+                className={`w-full items-center flex justify-center gap-2 bg-[#244034] hover:bg-[#1a3328] text-white font-medium py-3 px-4 rounded-lg transition duration-200 ${
+                  resendLoading ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
+                }`} 
+                disabled={resendLoading}
+                onClick={handleResendEmail}
+              >
+                {resendLoading ? "Resending..." : "Resend Confirmation Email"}
                 {resendLoading && (
-                  <div className="w-4 h-4 border-2 border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                 )}
               </button>
-
-              {/* <Link to="/signup"> */}
-              {/* <button className={`w-full flex justify-center items-center gap-2 border border-[#244034] text-[#244034] hover:bg-[#244034]/5 font-medium py-3 px-4 rounded-lg transition duration-200 cursor-pointer ${emailEditLoading? "opacity-60 cursor-not-allowed pointer-events-none": ""}`} onClick={emailEditHandler}>
-              {emailEditLoading ? "redirecting..." : "Change Email Address"}
-              {emailEditLoading && (
-                <div className="w-4 h-4 border-2 border-t-transparent rounded-full animate-spin"></div>
-              )}
-              </button> */}
-              {/* </Link> */}
             </div>
 
             <div className="mt-6 pt-6 border-t border-gray-200 text-center">
               <p className="text-sm text-gray-500">
                 Didn't receive the email? Check your spam folder or
-                <a href="#" className="text-[#244034] font-medium ml-1 hover:underline">contact support</a>.
+                <span className="text-[#244034] font-medium ml-1">contact support</span>.
               </p>
             </div>
           </div>
@@ -115,7 +105,7 @@ const EmailConfirmationPage = () => {
           {/* Footer */}
           <div className="bg-gray-50 py-4 px-6 text-center">
             <p className="text-xs text-gray-500">
-              © 2023 Your Company. All rights reserved.
+              © 2024 Career Spring. All rights reserved.
             </p>
           </div>
         </div>
