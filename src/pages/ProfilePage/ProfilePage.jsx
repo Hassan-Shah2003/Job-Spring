@@ -5,15 +5,16 @@ import toast from 'react-hot-toast';
 import { CircleX, MoveLeftIcon, PersonStanding } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import BigJobLoader from '../../components/common/loader/BigJobLoader';
+import { profileSchema } from '../../services/utils/schemas/ProfileSchema';
 
 const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState('about');
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
-
-  const { user } = useAuth();
-  // console.log(user);
-
+  const [errors, setErrors] = useState({});
+  const { user, setUser } = useAuth();
+  // console.log();
+  const role = user.user_metadata.role
   const [userData, setUserData] = useState({
     name: "",
     title: "",
@@ -33,6 +34,7 @@ const ProfilePage = () => {
     experience: [],
     education: []
   });
+
   useEffect(() => {
     const fetchProfile = async () => {
       if (!user) return;
@@ -104,29 +106,85 @@ const ProfilePage = () => {
     const newArray = [...userData[arrayName]];
     newArray[index][field] = e.target.value;
     setUserData({ ...userData, [arrayName]: newArray });
+    const fieldPath = `${arrayName}[${index}].${field}`;
+    if (errors[fieldPath]) {
+      setErrors(prev => ({ ...prev, [fieldPath]: null }));
+    }
   };
 
-  const addArrayItem = (arrayName) => {
-    const lastItem = userData[arrayName][userData[arrayName].length - 1]
-    if (lastItem && Object.values(lastItem).some(val => val === "")) {
+const addArrayItem = (arrayName) => {
+  const lastItem = userData[arrayName]?.[userData[arrayName].length - 1];
+
+  // SAFE CHECK: ignore optional fields
+  const requiredFields = {
+    skills: ["name","level"], // level allowed to be 0
+    experience: ["position", "company", "period"], // description & logo optional
+    education: ["degree", "institution", "period"],
+    stats: ["number", "label"]
+  };
+
+  if (lastItem) {
+    const hasEmptyField = requiredFields[arrayName].some(key => {
+      const value = lastItem[key];
+
+      // empty OR spaces OR undefined OR null
+      return value === null || value === undefined || value.toString().trim() === "";
+    });
+
+    if (hasEmptyField) {
       toast.error("Please fill the current field first!");
       return;
     }
-    let newItem = {};
+  }
 
-    if (arrayName === 'skills') newItem = { name: '', level: 0, color: 'bg-blue-500' };
-    if (arrayName === 'experience') newItem = { position: '', company: '', period: '', description: '', logo: '' };
-    if (arrayName === 'education') newItem = { degree: '', institution: '', period: '', grade: '' };
-    if (arrayName === 'stats') newItem = { number: "", label: "" };
-    setUserData({ ...userData, [arrayName]: [...userData[arrayName], newItem] });
-  };
+  // Create new object based on arrayName
+  let newItem = {};
+
+  if (arrayName === "skills")
+    newItem = { name: "", level: 0, color: "bg-blue-500" };
+
+  if (arrayName === "experience")
+    newItem = { position: "", company: "", period: "", description: "", logo: "" };
+
+  if (arrayName === "education")
+    newItem = { degree: "", institution: "", period: "", grade: "" };
+
+  if (arrayName === "stats")
+    newItem = { number: "", label: "" };
+
+  setUserData({
+    ...userData,
+    [arrayName]: [...userData[arrayName], newItem]
+  });
+};
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setUserData((prev) => ({ ...prev, [name]: value }));
+    setUserData((prev) => ({ ...prev, [name]: value }))
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: null }));
+    };
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    try {
+      await profileSchema.validate(userData, { abortEarly: false });
+      setErrors({});
+
+    } catch (validationError) {
+      const newErrors = {};
+      const errorObj = {};
+      if (validationError.inner && validationError.inner.length > 0) {
+        validationError.inner.forEach(err => {
+          newErrors[err.path] = err.message;
+          // toast.error(err.message);
+        });
+      }
+      setErrors(newErrors);
+      return;
+    }
+
     if (!user) return;
     try {
       const updates = {
@@ -214,8 +272,11 @@ const ProfilePage = () => {
 
       if (updateError) throw updateError;
 
+      const newUrl = `${avatarUrl}?r=${Date.now()}`;
+      setUser((prev) => ({ ...prev, avatar: newUrl }))
       // 5️⃣ Update local state (instant reflect)
       setUserData((prev) => ({ ...prev, avatar: avatarUrl }));
+      // updateAvatar(avatarUrl);
       toast.success("Profile picture updated!");
       // console.log(avatarUrl, "avatarUrl----------");
 
@@ -238,12 +299,42 @@ const ProfilePage = () => {
 
       if (error) throw error;
       setUserData((prev) => ({ ...prev, avatar: null }));
+         // ❗ Most important → update global AuthContext state
+    setUser(prev => ({
+      ...prev,
+      avatar: null,
+    }));
       toast.success("Profile photo removed!");
     } catch (error) {
       console.error(error);
       toast.error("Failed to remove photo");
     }
   }
+  const cleanupEmptyFields = () => {
+  const sections = ["skills", "experience", "education", "stats"];
+
+  const newData = { ...userData };
+
+  sections.forEach(section => {
+    const arr = newData[section];
+    // console.log(arr);
+    
+
+    if (Array.isArray(arr) && arr.length > 0) {
+      const last = arr[arr.length - 1];
+
+      // Check if all fields empty → remove
+      const isEmpty = Object.values(last).every(v => !v || v.toString().trim() === "");
+
+      if (isEmpty) {
+        newData[section] = arr.slice(0, -1);
+      }
+    }
+  });
+
+  setUserData(newData);
+};
+
 
   if (loading)
     return (
@@ -271,11 +362,15 @@ const ProfilePage = () => {
             </button>
           )}
           <button
-            onClick={() => setIsEditing(!isEditing)}
-            className="px-4 py-2 rounded-xl bg-[#244034] text-white hover:bg-green-700 transition mr-7"
-          >
-            {isEditing ? "Close Form" : "Edit Profile"}
-          </button>
+  onClick={() => {
+    if (isEditing) cleanupEmptyFields(); 
+    setIsEditing(!isEditing);
+  }}
+  className="px-4 py-2 rounded-xl bg-[#244034] text-white hover:bg-green-700 transition mr-7 cursor-pointer"
+>
+  {isEditing ? "Close Form" : "Edit Profile"}
+</button>
+
         </div>
 
         {/* Edit Form */}
@@ -286,149 +381,235 @@ const ProfilePage = () => {
             <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4">
 
               {/* Simple Fields */}
-              {['name', 'age', 'title', 'tagline', 'location', 'email', 'phone', 'about', 'avatar'].map((key) => (
+              {['name', 'age', 'title', 'tagline', 'location', 'email', 'phone', 'about'].map((key) => (
                 <div key={key}>
                   <label className="block text-gray-700 font-medium mb-1">
                     {key.charAt(0).toUpperCase() + key.slice(1)}
                   </label>
                   {key === 'about' ? (
+
                     <textarea
                       name={key}
                       value={userData[key]}
                       onChange={handleChange}
-                      className="w-full border border-gray-300 rounded px-3 py-2"
+                      className={`w-full border rounded px-3 py-2 
+                      ${errors[key] ? "border-red-500" : "border-gray-300"}`}
                       rows={4}
                     />
+
                   ) : (
                     <input
-                      type={key === 'email' ? 'email' : 'text'}
+                      type={key === "email" ? "email" : key === "age" ? "number" : "text"}
                       name={key}
                       value={userData[key]}
                       onChange={handleChange}
-                      className="w-full border border-gray-300 rounded px-3 py-2"
+                      className={`w-full border rounded px-3 py-2 
+    ${errors[key] ? "border-red-500" : "border-gray-300"}`}
                     />
+                  )}
+                  {errors[key] && (
+                    <p className="text-red-500 text-sm font-bold pt-2">{errors[key]}</p>
                   )}
                 </div>
               ))}
 
               {/* Skills */}
-              <div>
+              {role === "seeker" && <div>
                 <h3 className="text-lg font-semibold mb-2">Skills</h3>
                 {userData.skills.map((skill, index) => (
-                  <div key={index} className="flex gap-2 mb-2">
-                    <input
-                      type="text"
-                      placeholder="Skill Name"
-                      value={skill.name}
-                      onChange={(e) => handleArrayChange(e, 'skills', index, 'name')}
-                      className="w-1/2 border border-gray-300 rounded px-3 py-2"
-                    />
-                    <input
-                      type="number"
-                      placeholder="1 to 100 %"
-                      value={skill.level}
-                      onChange={(e) => handleArrayChange(e, 'skills', index, 'level')}
-                      className="w-1/2 border border-gray-300 rounded px-3 py-2"
-                    />
+                  <div key={index} className="w-full flex gap-2 mb-2">
+                    <div className='mb-2 w-full'>
+                      <input
+                        type="text"
+                        placeholder="Skill Name"
+                        value={skill.name}
+                        onChange={(e) => handleArrayChange(e, 'skills', index, 'name')}
+                        className={`w-full border rounded px-3 py-2 
+      ${errors[`skills[${index}].name`] ? "border-red-500" : "border-gray-300"}`}
+                      />
+                      {errors[`skills[${index}].name`] && (
+                        <p className="text-red-500 text-sm font-bold pt-2">
+                          {errors[`skills[${index}].name`]}
+                        </p>
+                      )}
+                    </div>
+                    <div className='mb-2 w-full'>
+                      <input
+                        type="number"
+                        placeholder="1 to 100 %"
+                        value={skill.level}
+                        onChange={(e) => handleArrayChange(e, 'skills', index, 'level')}
+                        className={`w-full border rounded px-3 py-2 
+      ${errors[`skills[${index}].level`] ? "border-red-500" : "border-gray-300"}`}
+                      />
+                      {errors[`skills[${index}].level`] && (
+                        <p className="text-red-500 text-sm font-bold pt-2">
+                          {errors[`skills[${index}].level`]}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 ))}
                 <button type="button" onClick={() => addArrayItem('skills')} className="text-[14px] text-[#244034] cursor-pointer">+ Add Skill</button>
-              </div>
+              </div>}
 
               {/* Experience */}
-              <div>
+              {role === "seeker" && <div>
                 <h3 className="text-lg font-semibold mb-2">Experience</h3>
                 {userData.experience.map((exp, index) => (
                   <div key={index} className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
-                    <input
-                      type="text"
-                      placeholder="Position eg;manager,webdeveloper"
-                      value={exp.position}
-                      onChange={(e) => handleArrayChange(e, 'experience', index, 'position')}
-                      className="border border-gray-300 rounded px-3 py-2"
-                    />
+                    <div className="mb-2 w-full">
+                      <input
+                        type="text"
+                        placeholder="Position eg;manager,webdeveloper"
+                        value={exp.position}
+                        onChange={(e) => handleArrayChange(e, 'experience', index, 'position')}
+                        className={`w-full border rounded px-3 py-2 
+      ${errors[`experience[${index}].position`] ? "border-red-500" : "border-gray-300"}
+`}
+                      />
+                      {errors[`experience[${index}].position`] && (
+                        <p className="text-red-500 text-sm font-bold pt-2">{errors[`experience[${index}].position`]}</p>
+                      )}
+                    </div>
+                      <div className='mb-2 w-full'>
                     <input
                       type="text"
                       placeholder="Company name"
                       value={exp.company}
                       onChange={(e) => handleArrayChange(e, 'experience', index, 'company')}
-                      className="border border-gray-300 rounded px-3 py-2"
+                      className={`w-full border border-gray-300 rounded px-3 py-2 ${errors[`experience[${index}].company`] ? "border-red-500" : "border-gray-300"}
+`}                  
                     />
+                    {errors[`experience[${index}].company`] && (
+                      <p className="text-red-500 text-sm font-bold pt-2">{errors[`experience[${index}].company`]}</p>
+                    )}
+                    </div>
+                    <div className='mb-2 w-full'>
                     <input
                       type="text"
                       placeholder="eg;Jan 2022 - Present or Jun 2020 - Dec 2021"
                       value={exp.period}
                       onChange={(e) => handleArrayChange(e, 'experience', index, 'period')}
-                      className="border border-gray-300 rounded px-3 py-2"
+                      className={`w-full border border-gray-300 rounded px-3 py-2 ${errors[`experience[${index}].period`] ? "border-red-500" : "border-gray-300"}
+`}
                     />
+
+                    {errors[`experience[${index}].period`] && (
+                      <p className="text-red-500 text-sm font-bold pt-2">{errors[`experience[${index}].period`]}</p>
+                    )}
+                    </div>
+                    <div className='mb-2 w-full'>
                     <input
                       type="text"
                       placeholder="Description"
                       value={exp.description}
                       onChange={(e) => handleArrayChange(e, 'experience', index, 'description')}
-                      className="border border-gray-300 rounded px-3 py-2"
+                      className={`w-full border border-gray-300 rounded px-3 py-2 ${errors[`experience[${index}].description`] ? "border-red-500" : "border-gray-300"}
+`}
                     />
+                    {errors[`experience[${index}].description`] && (
+                      <p className="text-red-500 text-sm font-bold pt-2">{errors[`experience[${index}].description`]}</p>
+                    )}
+                    </div>
                   </div>
                 ))}
                 <button type="button" onClick={() => addArrayItem('experience')} className="text-[14px] text-[#244034] cursor-pointer">+ Add Experience</button>
-              </div>
+              </div>}
 
               {/* Education */}
-              <div>
+              {role === "seeker" && <div>
                 <h3 className="text-lg font-semibold mb-2">Education</h3>
                 {userData.education.map((edu, index) => (
                   <div key={index} className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
+                    <div className='mb-2 w-full'>
                     <input
                       type="text"
                       placeholder="eg;bachelore,master"
                       value={edu.degree}
                       onChange={(e) => handleArrayChange(e, 'education', index, 'degree')}
-                      className="border border-gray-300 rounded px-3 py-2"
+                      className={`w-full border border-gray-300 rounded px-3 py-2 ${errors[`education[${index}].degree`] ? "border-red-500" : "border-gray-300"}
+`}
+
                     />
+                    {errors[`education[${index}].degree`] && (
+                      <p className="text-red-500 text-sm font-bold pt-2">{errors[`education[${index}].degree`]}</p>
+                    )}
+                    </div>
+                    <div className='mb-2 w-full'>
                     <input
                       type="text"
                       placeholder="Institution name"
                       value={edu.institution}
                       onChange={(e) => handleArrayChange(e, 'education', index, 'institution')}
-                      className="border border-gray-300 rounded px-3 py-2"
+                      className={`w-full border border-gray-300 rounded px-3 py-2 ${errors[`education[${index}].institution`] ? "border-red-500" : "border-gray-300"}
+`}
                     />
+                    {errors[`education[${index}].period`] && (
+                      <p className="text-red-500 text-sm font-bold pt-2">{errors[`education[${index}].institution`]}</p>
+                    )}
+                    </div>
+                    <div className='mb-2 w-full'>
                     <input
                       type="text"
                       placeholder="Jan 2020 - May 2020"
                       value={edu.period}
                       onChange={(e) => handleArrayChange(e, 'education', index, 'period')}
-                      className="border border-gray-300 rounded px-3 py-2"
+                      className={`w-full border border-gray-300 rounded px-3 py-2 ${errors[`education[${index}].period`] ? "border-red-500" : "border-gray-300"}
+`}
                     />
+                    {errors[`education[${index}].period`] && (
+                      <p className="text-red-500 text-sm font-bold pt-2">{errors[`education[${index}].period`]}</p>
+                    )}
+                    </div>
+                    <div className='mb-2 w-full'>
                     <input
                       type="number"
                       placeholder="1 to 100 %"
                       value={edu.grade}
                       onChange={(e) => handleArrayChange(e, 'education', index, 'grade')}
-                      className="border border-gray-300 rounded px-3 py-2"
+                      className={`w-full border border-gray-300 rounded px-3 py-2 ${errors[`education[${index}].grade`] ? "border-red-500" : "border-gray-300"}
+`}
                     />
+                    {errors[`education[${index}].grade`] && (
+                      <p className="text-red-500 text-sm font-bold pt-2">{errors[`education[${index}].grade`]}</p>
+                    )}
+                    </div>
                   </div>
                 ))}
                 <button type="button" onClick={() => addArrayItem('education')} className="text-[14px] text-[#244034] cursor-pointer">+ Add Education</button>
-              </div>
-              <div>
+              </div>}
+              {role === "seeker" && <div>
                 <h3 className="text-lg font-semibold mb-2">Stats</h3>
                 {userData.stats.map((stat, index) => (
                   <div key={index} className="flex gap-2 mb-2">
+                    <div className='mb-2 w-full'>
                     <input
                       type="text"
                       disabled
                       placeholder="Label"
                       value={stat.label}
                       onChange={(e) => handleArrayChange(e, 'stats', index, 'label')}
-                      className="w-1/2 border border-gray-300 rounded px-3 py-2"
+                      className={`w-full border  border-gray-300 rounded px-3 py-2 ${errors[`education[${index}].label`] ? "border-red-500" : "border-gray-300"}
+`}
                     />
+                    {/* {errors[`experience[${index}].period`] && (
+                      <p className="text-red-500 text-sm">{errors[`experience[${index}].period`]}</p>
+                    )} */}
+                    </div>
+                    <div className='mb-2 w-full'>
                     <input
                       type="number"
                       placeholder="Number"
                       value={stat.number}
                       onChange={(e) => handleArrayChange(e, 'stats', index, 'number')}
-                      className="w-1/2 border border-gray-300 rounded px-3 py-2"
+                      className={`w-full border border-gray-300 rounded px-3 py-2 ${errors[`education[${index}].number`] ? "border-red-500" : "border-gray-300"}
+`}
                     />
+                    {errors[`experience[${index}].period`] && (
+                      <p className="text-red-500 text-sm">{errors[`education[${index}].number`]}</p>
+                    )}
+                    </div>
                   </div>
                 ))}
                 {/* <button
@@ -438,9 +619,9 @@ const ProfilePage = () => {
   >
     + Add Stat
   </button> */}
-              </div>
+              </div>}
               <div className="flex justify-end mt-4">
-                <button type="submit" onSubmit={handleSubmit} className="px-6 py-3 rounded-xl bg-green-500 text-white hover:bg-green-600 transition">
+                <button type="submit" onSubmit={handleSubmit} className="px-6 py-3 rounded-xl bg-green-500 cursor-pointer text-white hover:bg-green-600 transition">
                   Save Changes
                 </button>
               </div>
@@ -513,14 +694,14 @@ const ProfilePage = () => {
                     </p>
 
                     {/* Stats */}
-                    <div className="grid grid-cols-3 gap-4 mt-8 w-full">
+                    {role === "seeker" && <div className="grid grid-cols-3 gap-4 mt-8 w-full">
                       {(userData.stats || []).map((stat, index) => (
                         <div key={index} className="text-center">
                           <div className="text-xl font-bold">{stat.number || 0}</div>
                           <div className="text-xs text-blue-200">{stat.label}</div>
                         </div>
                       ))}
-                    </div>
+                    </div>}
                   </div>
 
                   {/* Profile Info Section */}
@@ -576,7 +757,7 @@ const ProfilePage = () => {
                             <p className="font-medium">{userData.stats.find(stat => stat.label === "Years Experience")?.number || "0"} years</p>
                           </div>
                         </div>
-                        <div className="flex items-center p-3 bg-green-100 rounded-lg">
+                        {role === "seeker" && <div className="flex items-center p-3 bg-green-100 rounded-lg">
                           <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center mr-3">
                             <PersonStanding />
                           </div>
@@ -584,12 +765,12 @@ const ProfilePage = () => {
                             <p className="text-sm text-gray-500">Age</p>
                             <p className="font-medium">{userData.age || "N/A"}</p>
                           </div>
-                        </div>
+                        </div>}
                       </div>
 
                       {/* Action Buttons */}
                       <div className="flex space-x-4 mt-auto">
-                        <button className="flex-1 bg-gradient-to-r from-green-700 to-green-600 text-white px-6 py-3 rounded-xl font-medium transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-xl">
+                        <button className="flex-1 bg-gradient-to-r from-green-700 to-green-600 text-white px-6 py-3 rounded-xl font-medium transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-xl cursor-pointer">
                           Contact Me
                         </button>
                         {/* <button className="flex-1 border-2 border-gray-300 hover:border-green-500 text-gray-700 hover:text-green-700 px-6 py-3 rounded-xl font-medium transition-all duration-300 transform hover:-translate-y-1">
@@ -605,24 +786,27 @@ const ProfilePage = () => {
               <div className="bg-white rounded-2xl shadow-xl overflow-hidden mb-8 border border-gray-100">
                 <div className="border-b border-gray-200">
                   <nav className="flex overflow-x-auto">
-                    {[
-                      { id: "about", label: "About Me", icon: "👤" },
-                      { id: "skills", label: "Skills", icon: "💡" },
-                      { id: "experience", label: "Experience", icon: "💼" },
-                      { id: "education", label: "Education", icon: "🎓" },
-                    ].map((tab) => (
-                      <button
-                        key={tab.id}
-                        className={`flex items-center whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-all duration-300 ${activeTab === tab.id
-                          ? "border-blue-500 text-white bg-[#244034]"
-                          : "border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50"
-                          }`}
-                        onClick={() => setActiveTab(tab.id)}
-                      >
-                        <span className="mr-2 text-lg">{tab.icon}</span>
-                        {tab.label}
-                      </button>
-                    ))}
+                    {(role === "seeker"
+                      ? [
+                        { id: "about", label: "About Me", icon: "👤" },
+                        { id: "skills", label: "Skills", icon: "💡" },
+                        { id: "experience", label: "Experience", icon: "💼" },
+                        { id: "education", label: "Education", icon: "🎓" },
+                      ] : [{ id: "about", label: "About Me", icon: "👤" }
+
+                      ]).map((tab) => (
+                        <button
+                          key={tab.id}
+                          className={`flex items-center whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-all duration-300 ${activeTab === tab.id
+                            ? "border-blue-500 text-white bg-[#244034]"
+                            : "border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+                            }`}
+                          onClick={() => setActiveTab(tab.id)}
+                        >
+                          <span className="mr-2 text-lg">{tab.icon}</span>
+                          {tab.label}
+                        </button>
+                      ))}
                   </nav>
                 </div>
 
@@ -636,7 +820,7 @@ const ProfilePage = () => {
                       </h2>
                       {userData.about ? (
                         <>
-                          <p className="text-gray-600 leading-relaxed text-lg">
+                          <p className="text-gray-600 leading-relaxed text-lg font-medium font-serif">
                             {userData.about}
                           </p>
 
@@ -732,16 +916,16 @@ const ProfilePage = () => {
                                 </div>
                               </div>
                               <div className="flex-grow">
-                                <h3 className="text-lg font-semibold text-gray-800 group-hover:text-blue-600 transition-colors duration-300">
+                                <h3 className="text-lg font-bold text-gray-800 group-hover:text-blue-600 transition-colors duration-300">
                                   {exp.position}
                                 </h3>
                                 <div className="flex flex-col sm:flex-row sm:justify-between text-gray-600 mb-1">
-                                  <span className="font-medium">{exp.company}</span>
-                                  <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                                  <span className="font-bold">{exp.company}</span>
+                                  <span className="text-md bg-blue-100 text-blue-800 px-2 py-1 rounded-full font-bold">
                                     {exp.period}
                                   </span>
                                 </div>
-                                <p className="text-gray-600 mt-2">{exp.description}</p>
+                                <p className="text-gray-600 mt-2 text-md font-medium">{exp.description}</p>
                               </div>
                             </div>
                           ))}
@@ -772,13 +956,13 @@ const ProfilePage = () => {
                                 <span className="font-medium text-blue-600">
                                   {edu.institution}
                                 </span>
-                                <span className="text-sm bg-green-100 text-green-800 px-3 py-1 rounded-full">
+                                <span className="text-md font-bold bg-green-100 text-green-800 px-3 py-1 rounded-full">
                                   {edu.period}
                                 </span>
                               </div>
                               <div className="flex justify-between items-center">
-                                <span className="text-gray-600">Grade: {edu.grade}</span>
-                                <span className="text-blue-600 font-medium">Completed</span>
+                                <span className="text-gray-600 text-md font-bold">Grade: {edu.grade}</span>
+                                {/* <span className="text-blue-600 font-medium">Completed</span> */}
                               </div>
                             </div>
                           ))}

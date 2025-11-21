@@ -2,11 +2,11 @@ import { LoaderCircle } from "lucide-react";
 import { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 
-const SearchBar = ({ onSearch }) => {
+const SearchBar = ({ onSearch, k, l }) => {
   const [loading, setLoading] = useState(false);
-  const [location, setLocation] = useState("");
+  const [location, setLocation] = useState(l ? l : "");
   // const [title, setTitle] = useState("");
-  const [keyword, setKeyword] = useState(""); // 🔹 new text input
+  const [keyword, setKeyword] = useState(k ? k : ""); // 🔹 new text input
   const navigate = useNavigate();
   const handleSubmit = () => {
 
@@ -20,6 +20,8 @@ const SearchBar = ({ onSearch }) => {
         onSearch({ keyword, location });
       }
       else {
+        console.log(keyword, location);
+
         navigate("/jobs", { state: { keyword, location } });
       }
     }, 1000);
@@ -41,7 +43,7 @@ const SearchBar = ({ onSearch }) => {
                      outline-none transition-all duration-200" placeholder="Job title,Keywords, or company" value={keyword}
           onChange={(e) => setKeyword(e.target.value)} >
         </input>
-        
+
         <div><hr /></div>
         <input
           type="text"

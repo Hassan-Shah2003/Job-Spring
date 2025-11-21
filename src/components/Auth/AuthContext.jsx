@@ -8,7 +8,12 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [role, setRole] = useState(null); // ✅ Add role
+  // const [session, setSession] = useState(null);
+  const savedData = localStorage.getItem("signup_formData");
+  const parsedData = JSON.parse(savedData); // Convert string back to object
+  console.log(parsedData);
 
+  // const [avatar, setAvatar] = useState(localStorage.getItem('avatar') || null);
   const showToast = (message, type = "success") => {
     if (type === "error") {
       toast.error(message, { position: "top-center" });
@@ -16,7 +21,10 @@ export const AuthProvider = ({ children }) => {
       toast.success(message, { position: "top-center" });
     }
   };
-
+  // const updateAvatar = (url) => {
+  //   setAvatar(url);
+  //   localStorage.setItem("avatar", url);
+  // }
   // Get current session and listen to auth state changes
   useEffect(() => {
     const getSession = async () => {
@@ -24,7 +32,7 @@ export const AuthProvider = ({ children }) => {
       const sessionUser = sessionData?.session?.user || null;
       // console.log(sessionUser);
 
-      setUser(sessionUser);
+      // setUser(sessionUser);
 
       if (sessionUser) {
         // 1️⃣ Try getting role from metadata first
@@ -42,14 +50,20 @@ export const AuthProvider = ({ children }) => {
         // 👇 Merge both Auth user & Profile data into one object
         const mergedUser = {
           ...sessionUser,
-          avatar: profileData?.avatar,
+          avatar: `${profileData?.avatar}?r=${Date.now()}`,
         };
         // console.log(mergedUser, "✅ Merged user + profile");
 
         // Store it in state for global access
         setUser(mergedUser);
+
+        // if (profileData?.avatar) {
+        //   updateAvatar(profileData.avatar);   // ⭐ STORE IN LOCAL
+        // }
         // if (profileData?.role) setRole(profileData.role);
         // setUser((prev) => ({ ...prev, ...profileData })) 
+        // setUserData(prev => ({ ...prev, avatar: avatarUrl }));
+        // updateAvatar(avatarUrl);
       }
 
       setLoading(false);
@@ -60,7 +74,7 @@ export const AuthProvider = ({ children }) => {
     // ✅ Listen to auth state changes
     const { data: { subscription } } = supaBase.auth.onAuthStateChange(
       async (_event, session) => {
-        setUser(session?.user || null);
+        // setUser(session?.user || null);
         if (session?.user) {
           setRole(session.user.user_metadata?.role || null);
         } else {
@@ -76,6 +90,17 @@ export const AuthProvider = ({ children }) => {
   const SignUpUser = async (formData) => {
     const { email, password } = formData;
 
+    try {
+       const { data: userExists } = await supaBase
+      .from("profiles")
+      .select("user_id")
+      .eq("email", email)
+      .maybeSingle();
+
+    if (userExists) {
+      // Duplicate exists → stop signup
+      throw new Error("This email is already registered. Please log in.");
+    }
     const { data, error } = await supaBase.auth.signUp({
       email,
       password,
@@ -88,11 +113,25 @@ export const AuthProvider = ({ children }) => {
           location: formData.location,
           about: formData.about,
         },
-        emailRedirectTo: "http://localhost:5173/jobs",
+        // emailRedirectTo: "http://localhost:5173/jobs", //local
+        emailRedirectTo: "https://career-spring.netlify.app/jobs",//prod
       },
     });
-
+    console.log(data);
     if (error) throw error;
+    return data;
+    
+    } catch (error) {
+      throw error;
+    }
+   
+   
+   
+   
+   
+   
+   
+    
     // if (data?.user) {
     //   await supaBase.from("profiles").insert([
     //     {
@@ -114,7 +153,6 @@ export const AuthProvider = ({ children }) => {
     //   ]);
     // }
 
-    return data;
   };
 
   // Sign in existing user
@@ -163,7 +201,27 @@ export const AuthProvider = ({ children }) => {
           age: null,
         },
       ]);
-    }
+    } const { data: profileData } = await supaBase
+      .from("profiles")
+      .select("*")
+      .eq("user_id", data.user.id)
+      .single();
+
+       const mergedUser = {
+    ...data.user,
+    avatar: profileData?.avatar ? `${profileData.avatar}?r=${Date.now()}` : null,
+    fullName: profileData?.name || data.user.user_metadata.fullName || "U",
+  };
+
+  // Update state → avatar and name show turant
+  setUser(mergedUser);
+
+  return data;
+
+    // if (profileData?.avatar) {
+    //   updateAvatar(profileData.avatar);
+    // }
+
     // console.log(data);
 
     return data;
@@ -176,12 +234,39 @@ export const AuthProvider = ({ children }) => {
       showToast("Logout failed. Please try again.", "error");
       throw error;
     }
+    localStorage.removeItem("signup_formData");
+    // localStorage.removeItem("avatar");
     setUser(null);
-    showToast("Logout successful!", "success");
+    showToast("Logout successful!");
+  };
+  const resendEmailVerification = async (email) => {
+    try {
+      const { data, error } = await supaBase.auth.resend({
+        type: "signup",
+        email,
+        options: {
+          emailRedirectTo: "http://localhost:5173/confirm-email",
+        },
+      });
+
+      if (error) {
+        showToast(error.message, "error");
+        return false;
+      }
+
+      // showToast("Verification email resent!");
+      return true;
+
+    } catch (err) {
+      // showToast("Something went wrong!", "error");
+      return false;
+    }
   };
 
+
+
   return (
-    <authContext.Provider value={{ user, loading, SignUpUser, signInUser, signOutUser }}>
+    <authContext.Provider value={{ user, loading, resendEmailVerification, SignUpUser, signInUser, signOutUser, setUser }}>
       {children}
     </authContext.Provider>
   );

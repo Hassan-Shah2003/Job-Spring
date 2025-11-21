@@ -111,7 +111,7 @@ const BlogsDetailedPage = () => {
               <button
                 onClick={handleBack}
                 disabled={backLoading}
-                className={`flex items-center gap-2 px-6 py-3 rounded-lg font-bold transition ${backLoading
+                className={`flex items-center cursor-pointer gap-2 px-6 py-3 rounded-lg font-bold transition ${backLoading
                     ? "bg-gray-400 cursor-not-allowed"
                     : "bg-[#244034] hover:bg-[#c5f542] hover:text-black text-white"
                   }`}

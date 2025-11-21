@@ -14,148 +14,187 @@ import { CircleArrowLeft } from "lucide-react";
 const FindJobsPage = () => {
   const location = useLocation();
   const { id } = useParams();
+  // const [allJobs, setAllJobs] = useState([]);
+  // const [jobs, setJobs] = useState([]);  
+  // const [selectedJob, setSelectedJob] = useState(null);
+  // const [loading, setLoading] = useState(false);
+
   const [allJobs, setAllJobs] = useState([]);
   const [jobs, setJobs] = useState([]);
   const [selectedJob, setSelectedJob] = useState(null);
-  const [loading, setLoading] = useState(false);
+  
+
+  
+  const [loading, setLoading] = useState(true);
+  
   const [locationSuggestions, setLocationSuggestions] = useState([]);
   const [jobLoading, setJobLoading] = useState(false);
   const queryParams = new URLSearchParams(location.search);
-  // console.log(queryParams);
-
   const categoryFilter = queryParams.get("category");
-  // console.log(categoryFilter);
+  
+  const rememberedState = useMemo(() => {
+return {
+ keyword: location.state?.keyword ?? "",
+ location: location.state?.location ?? ""
+};
+}, [location.state]);
+  const [filters, setFilters] = useState(rememberedState);
+  /* -----------------------------------------
+     1️⃣ Apply filters passed using location.state
+     ----------------------------------------- */
+  useEffect(() => {
+    if (!location.state) return;
 
+    const { keyword, location: loc } = location.state;
+
+    setFilters((prev) => ({
+      ...prev,
+      keyword: keyword || "",
+      location: loc || "",
+    }));
+  }, [location.state]);
+
+  /* -----------------------------------------
+     2️⃣ Fetch jobs (category-based)
+  ----------------------------------------- */
+  useEffect(() => {
+    const loadJobs = async () => {
+      setLoading(true);
+
+      let q = supabase.from("Jobs").select("*");
+      if (categoryFilter) q = q.eq("category", categoryFilter);
+
+      const { data } = await q;
+      
+      console.log(data, "data.............");
+
+
+      setAllJobs(data || []);
+      setJobs(data || []);
+      setLoading(false);
+    };
+
+    loadJobs();
+  }, [categoryFilter]);
+
+  /* -----------------------------------------
+     3️⃣ Auto fetch single job when ID exists
+  ----------------------------------------- */
+  useEffect(() => {
+    if (!id) return;
+
+    const fetchSingle = async () => {
+      setJobLoading(true);
+
+      const { data } = await supabase
+        .from("Jobs")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+
+        console.log(data);
+        
+      setSelectedJob(data || null);
+      setJobLoading(false);
+    };
+
+    fetchSingle();
+  }, [id]);
+
+  /* -----------------------------------------
+     4️⃣ Optimized Filtering when filters change
+  ----------------------------------------- */
+  useEffect(() => {
+    let filtered = [...allJobs];
+
+    // location filter
+    if (filters?.location?.trim() !== "") {
+      const loc = filters?.location?.toLowerCase();
+      filtered = filtered.filter((job) =>
+        job.location?.toLowerCase().includes(loc)
+      );
+      console.log(filtered);
+      
+    }
+
+    // keyword filter
+    if (filters?.keyword?.trim() !== "") {
+  const k = filters.keyword.toLowerCase().split(" ");
+
+  filtered = filtered.filter((job) => {
+    const text = `
+      ${job.title || ""} 
+      ${job.company || ""} 
+      ${job.description || ""}
+    `.toLowerCase();
+
+    return k.every((word) => text.includes(word));
+  });
+}
+
+    setJobs(filtered);
+  }, [filters, allJobs]);
+
+  /* -----------------------------------------
+     5️⃣ Handle job click with delay animation
+  ----------------------------------------- */
   const handleSelectedJob = (job) => {
     setJobLoading(true);
     setSelectedJob(null);
+
     setTimeout(() => {
       setSelectedJob(job);
       setJobLoading(false);
-    }, 400);
-  }
-  //  Fetch all jobs from Supabase
+    }, 300);
+  };
 
-
-  useEffect(() => {
-    const fetchJobs = async () => {
-      setLoading(true)
-      let query = supabase.from("Jobs").select("*");
-      if (categoryFilter) {
-        query = query.eq("category", categoryFilter);
-      }
-      const { data, error } = await query;
-      // console.log(data);
-
-      setLoading(false);
-      if (error) {
-        // console.error("Error fetching jobs:", error);
-      } else {
-        setAllJobs(data || []);
-        setJobs(data || []);
-      }
-    };
-    fetchJobs();
-  }, [categoryFilter]);
-  useEffect(() => {
-    if (id) {
-      setJobLoading(true);
-      const fetchSingleJob = async () => {
-        const { data, error } = await supabase.from("Jobs").select("*").eq("id", id).single()
-        if (!error && data) setSelectedJob(data);
-        setJobLoading(false);
-      }
-      fetchSingleJob();
-    }
-  }, [id])
-  useEffect(() => {
-    if (selectedJob) window.scrollTo(0, 0);
-  }, [selectedJob]);
-  useEffect(() => {
-    if (location.state) {
-      const { keyword, location: jobLocation } = location.state;
-      handleSearch({ keyword, location: jobLocation });
-
-    }
-  }, [location.state])
-
+  /* -----------------------------------------
+     6️⃣ Debounced location suggestion search
+  ----------------------------------------- */
   const fetchLocationSuggestion = async (query) => {
-    if (!query || query.trim().length < 2) {
+    if (!query || query.length < 2) {
       setLocationSuggestions([]);
       return;
     }
-    const { data, error } = await supabase.from("Jobs").select("location").ilike("location", `%${query}%`).limit(10);
-    if (!error && data) {
-      const unique = [...new Set(data.map((item) => item.location).filter(Boolean))];
-      setLocationSuggestions(unique)
+
+    const { data } = await supabase
+      .from("Jobs")
+      .select("location")
+      .ilike("location", `%${query}%`)
+      .limit(10);
+
+    if (data) {
+      const unique = [...new Set(data.map((i) => i.location).filter(Boolean))];
+      setLocationSuggestions(unique);
     }
-  }
-  const debouncedFetch = useMemo(() => debounce(fetchLocationSuggestion, 350), [])
+  };
+
+  const debouncedFetch = useMemo(
+    () => debounce(fetchLocationSuggestion, 300),
+    []
+  );
+
   useEffect(() => {
     return () => debouncedFetch.cancel();
   }, [debouncedFetch]);
-  const handleSearch = (filters) => {
-    // console.log(filters);
 
-    const { location, keyword } = filters;
-    // console.log(filters);
-
-    // console.log("🔍 SEARCH STARTED ==========");
-    // console.log("Filters received:", filters);
-    // console.log("Total jobs in allJobs:", allJobs.length);
-    let filtered = allJobs;
-
-    if (location && location.trim() !== "") {
-      // console.log("📍 Filtering by location:", location);
-      filtered = filtered.filter(
-        (job) =>
-          job.location?.toLowerCase().includes(location.trim().toLowerCase())
-      );
-      // console.log("After location filter:", filtered.length);
-
-    }
-
-    // if (title && title.trim() !== "") {
-    //   filtered = filtered.filter(
-    //     (job) =>
-    //       job.title?.trim().toLowerCase() === title.trim().toLowerCase()
-    //   );
-    // }
-    if (keyword && keyword.trim() !== "") {
-      const lowerKeyword = keyword.trim().toLowerCase();
-
-      filtered = filtered.filter((job) => {
-        // Check multiple fields with partial matching
-        const titleMatch = job.title?.toLowerCase().includes(lowerKeyword);
-        const companyMatch = job.company?.toLowerCase().includes(lowerKeyword);
-        const descriptionMatch = job.description?.toLowerCase().includes(lowerKeyword);
-
-        // ✅ TYPO TOLERANCE: Check for close matches
-        const closeMatch = job.title?.toLowerCase().includes(lowerKeyword.slice(0, 5)); // "front" se bhi match karega
-
-        return titleMatch || companyMatch || descriptionMatch || closeMatch;
-      });
-    }
-
-    // console.log("🎯 FINAL RESULTS:", filtered.length);
-    setJobs(filtered);
-    // setJobs(filtered);
+  /* -----------------------------------------
+     7️⃣ SearchBar → sets filters here
+  ----------------------------------------- */
+  const handleSearch = (f) => {
+    setFilters({
+      keyword: f.keyword || "",
+      location: f.location || "",
+    });
   };
-  // const handleSelectedJob=(job)=>{
-  //   setJobLoading(true);
-  //   setSelectedJob(null);
-  //   setTimeout(() => {
-  //     setSelectedJob(job);
-  //     setJobLoading(false)
-  //   }, 4000);
-  // }
 
   return (
     <>
       <div className="p-5 bg-[#244034]">
         <NavBar></NavBar>
       </div>
-      <SearchBar onSearch={handleSearch} />
+      <SearchBar onSearch={handleSearch} k={location?.state?.keyword || filters?.keyword} l={location?.state?.location || filters?.location} />
       {categoryFilter && (
         <div className="text-center mt-6 mb-10 p-4">
           <h2 className="text-xl font-semibold text-[#244034]">
@@ -183,7 +222,7 @@ const FindJobsPage = () => {
           <div className={`${selectedJob ? "hidden lg:flex" : "flex"
             } flex-col w-full lg:w-[30%] overflow-y-auto pr-2`}>
             <div className="w-full flex flex-col gap-4 overflow-y-auto h-full pr-2" style={{ maxHeight: "calc(100vh - 150px)" }}>
-              {jobs.map((job) => (
+              {jobs?.map((job) => (
                 <div
                   key={job.id}
                   className="cursor-pointer flex justify-center"

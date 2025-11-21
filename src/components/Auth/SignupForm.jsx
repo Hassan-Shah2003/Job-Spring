@@ -10,18 +10,23 @@ const SignupForm = () => {
     const { SignUpUser } = useAuth();
     const [loading, setLoading] = useState(false);
     const [toasts, setToasts] = useState([]);
+    const [isChangeEmail, setIsChangeEmail] = useState(false);
     const [errors, setErrors] = useState({});
-    const [formData, setFormData] = useState({
+    const savedData = localStorage.getItem("signup_formData");
+    const initialFormData = savedData
+        ? JSON.parse(savedData)
+        : {
+            fullName: "",
+            email: "",
+            password: "",
+            role: "",
+            companyName: "",
+            phone: "",
+            location: "",
+            about: "",
+        };
 
-        fullName: "",
-        email: "",
-        password: "",
-        role: "",
-        companyName: "",
-        phone: "",
-        location: "",
-        about: "",
-    });
+    const [formData, setFormData] = useState(initialFormData);
     const navigate = useNavigate();
     // const showToast = (message, type = "success", duration = 5000) => {
     //     const id = Date.now().toString();
@@ -46,10 +51,18 @@ const SignupForm = () => {
     // };
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }))
-        validateField(name, value);
+        const updatedData = { ...formData, [name]: value };
+        setFormData(updatedData);
+        console.log(updatedData);
 
+        //   setFormData(prev => ({ ...prev, [name]: value }))
+        localStorage.setItem("signup_formData", JSON.stringify(updatedData));
+        validateField(name, value);
     }
+    // console.log(formData, "form data...................");
+    // setFormData(updatedData);
+
+
     const validateField = async (name, value) => {
         try {
             // Validate only this field with current formData
@@ -86,14 +99,18 @@ const SignupForm = () => {
                     location: "",
                     about: "",
                 })
-                setTimeout(() => {
-                    navigate("/Login"); // ya koi bhi page jahan redirect karna hai
-                }, 1500);
+                navigate("/confirm-email", { state: formData }); // ya koi bhi page jahan redirect karna hai
+
             }
 
             else {
-                toast.error(`${error.message}`, "error");
-            }
+    if (error.message.includes("registered")) {
+        toast.error("This email is already registered. Please log in instead.");
+    } else {
+        toast.error(error.message);
+    }
+}
+            console.log(formData);
         }
         catch (validationError) {
             if (validationError.inner) {
@@ -111,6 +128,33 @@ const SignupForm = () => {
             setLoading(false);
         }
     }
+    const handleEmailUpdate = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+
+        if (!newEmail) {
+            toast.error("Please enter a new email");
+            setLoading(false);
+            return;
+        }
+
+        const { data, error } = await supaBase.auth.updateUser({
+            email: newEmail
+        });
+
+        if (error) {
+            toast.error(error.message);
+        } else {
+            toast.success("Email updated! Please verify your new email.");
+            localStorage.removeItem("signup_formData");
+            setNewEmail("");
+            setIsChangeEmail(false);
+            navigate("/confirm-email");
+        }
+
+        setLoading(false);
+    };
+
 
 
 
@@ -140,6 +184,48 @@ const SignupForm = () => {
                         </div>
                     </div>
                 </div>
+                {isChangeEmail && (
+                    <div className="bg-white/10 backdrop-blur-md p-8 rounded-2xl shadow-lg w-full max-w-md text-white relative border border-white/20">
+
+                        <h2 className="text-2xl font-bold text-center mb-4">Change Email Address</h2>
+
+                        <form className="flex flex-col gap-3" onSubmit={handleEmailUpdate}>
+                            <div className="mb-2">
+                                <input
+                                    type="email"
+                                    value={formData.email}
+                                    disabled
+                                    className="p-3 rounded-md bg-white/20 border border-white/30 text-gray-300 cursor-not-allowed w-full"
+                                />
+                            </div>
+
+                            <div className="mb-2">
+                                <input
+                                    type="email"
+                                    name="newEmail"
+                                    placeholder="New Email Address"
+                                    onChange={(e) => setNewEmail(e.target.value)}
+                                    className="p-3 rounded-md bg-white/20 border border-white/30 text-white w-full"
+                                />
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="mt-4 bg-gradient-to-r from-mint-300 to-white text-[#244034] font-semibold rounded-md p-3 hover:scale-105 transition-transform shadow-lg"
+                            >
+                                {loading ? "Updating Email..." : "Update Email"}
+                            </button>
+
+                            <p
+                                onClick={() => setIsChangeEmail(false)}
+                                className="text-center text-[#98ffcc] font-semibold hover:underline cursor-pointer mt-3"
+                            >
+                                Back to Signup
+                            </p>
+                        </form>
+                    </div>
+                )}
 
                 {/* ✅ Form */}
                 <h2 className="text-2xl font-bold text-center mb-4">Create Account</h2>
@@ -149,6 +235,7 @@ const SignupForm = () => {
                             name="fullName"
                             placeholder="Full Name"
                             onChange={handleChange}
+                            value={formData.fullName}
                             className="p-3 rounded-md bg-white/20 border border-white/30 placeholder-white text-white focus:outline-none focus:ring-2 w-full focus:ring-mint-300"
                         />
 
@@ -158,6 +245,7 @@ const SignupForm = () => {
                         <input
                             name="email"
                             type="email"
+                            value={formData.email}
                             onChange={handleChange}
                             placeholder="Email"
                             className="p-3 rounded-md bg-white/20 border border-white/30 placeholder-white text-white focus:outline-none focus:ring-2 w-full focus:ring-mint-300"
@@ -169,6 +257,7 @@ const SignupForm = () => {
                             name="password"
                             type="password"
                             onChange={handleChange}
+                            value={formData.password}
                             placeholder="Password"
                             className="p-3 rounded-md bg-white/20 border border-white/30 placeholder-white text-white focus:outline-none focus:ring-2 w-full focus:ring-mint-300"
                         />
@@ -178,6 +267,7 @@ const SignupForm = () => {
                         <select
                             name="role"
                             onChange={handleChange}
+                            value={formData.role}
                             className="p-3 rounded-md bg-white/20 border border-white/30 text-white focus:outline-none focus:ring-2 focus:ring-mint-300 w-full"
                         ><option value="" className="text-gray-900">
                                 Select A Role
@@ -195,6 +285,7 @@ const SignupForm = () => {
                         {formData.role === "company" && <input
                             name="companyName"
                             onChange={handleChange}
+                            value={formData.companyName}
                             placeholder="Company Name"
                             className="p-3 rounded-md bg-white/20 border border-white/30 placeholder-white text-white focus:outline-none focus:ring-2 w-full focus:ring-mint-300"
                         />}
@@ -206,6 +297,7 @@ const SignupForm = () => {
                             name="phone"
                             onChange={handleChange}
                             placeholder="Phone Number"
+                            value={formData.phone}
                             className="p-3 rounded-md bg-white/20 border border-white/30 placeholder-white text-white focus:outline-none focus:ring-2 w-full focus:ring-mint-300"
                         />
 
@@ -215,6 +307,7 @@ const SignupForm = () => {
                         <input
                             name="location"
                             onChange={handleChange}
+                            value={formData.location}
                             placeholder="City / Location"
                             className="p-3 rounded-md bg-white/20 border border-white/30 placeholder-white text-white focus:outline-none focus:ring-2 w-full focus:ring-mint-300"
                         />
@@ -224,6 +317,7 @@ const SignupForm = () => {
                         <textarea
                             name="about"
                             onChange={handleChange}
+                            value={formData.about}
                             placeholder="About yourself / company"
                             className="p-3 w-full rounded-md bg-white/20 border border-white/30 placeholder-white text-white focus:outline-none focus:ring-2 focus:ring-mint-300"
                         />
@@ -233,7 +327,7 @@ const SignupForm = () => {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="mt-4 bg-gradient-to-r from-mint-300 to-white text-[#244034] font-semibold rounded-md p-3 hover:scale-105 transition-transform shadow-lg flex items-center justify-center gap-2"
+                        className="mt-4 bg-gradient-to-r from-mint-300 to-white text-[#244034] font-semibold rounded-md p-3 hover:scale-105 transition-transform shadow-lg flex cursor-pointer items-center justify-center gap-2"
                     >
                         {loading && (
                             <div className="w-4 h-4 border-2 border-[#244034] border-t-transparent rounded-full animate-spin"></div>
@@ -241,7 +335,7 @@ const SignupForm = () => {
                         {loading ? "Signing Up..." : "Sign Up"}
                     </button>
                     <div className="text-center pt-2">
-                        <Link to={"/login"} className="text-[#98ffcc] font-semibold hover:underline">Alerady Account</Link>
+                        <Link to={"/login"} className="text-[#98ffcc] font-semibold hover:underline">Alerady Have Account?</Link>
                     </div>
                 </form>
             </div>

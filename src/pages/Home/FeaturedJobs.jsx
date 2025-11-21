@@ -13,43 +13,59 @@ const FeaturedJobs = () => {
 
   useEffect(() => {
     const fetchFeaturedJobs = async () => {
-  setLoading(true);
+      setLoading(true);
 
-  // Step 1: get jobs
-  const { data: jobs, error } = await supaBase
-    .from("Jobs")
-    .select("*")
-    .eq("is_featured", true)
-    .order("created_at", { ascending: false })
-    .limit(6);
+      // Step 1: get jobs
+      const { data: jobs, error } = await supaBase
+        .from("Jobs")
+        .select("*")
+        .eq("is_featured", true)
+        .order("created_at", { ascending: false })
+        .limit(6);
 
-  if (error) {
-    console.error("Jobs fetch error:", error);
-    setLoading(false);
-    return;
-  }
+      console.log(jobs);
+      if (error) {
+        console.error("Jobs fetch error:", error);
+        setLoading(false);
+        return;
+      }
 
-  // Step 2: for each job, fetch latest avatar from profiles
-  const jobsWithAvatars = await Promise.all(
-    jobs.map(async (job) => {
-      const { data: profile,error } = await supaBase
-        .from("profiles")
-        .select("avatar")
-        .eq("user_id", job.user_id)
-        .single();
+      // Step 2: for each job, fetch latest avatar from profiles
+      const jobsWithAvatars = await Promise.all(
+        jobs.map(async (job) => {
 
-      return {
-        ...job,
-        user_avatar:
-          profile?.avatar ||
-          "https://cdn-icons-png.flaticon.com/512/149/149071.png",
-      };
-    })
-  );
+          if (job.user_avatar) {
+            console.log(job.user_avatar, "job.user_avatar................");
+            return job;
 
-  setFeaturedJobs(jobsWithAvatars);
-  setLoading(false);
-};
+
+          }
+
+
+
+
+
+
+
+          const { data: profile, error } = await supaBase
+            .from("profiles")
+            .select("avatar")
+            .eq("user_id", job.user_id)
+            .single();
+
+
+          return {
+            ...job,
+            user_avatar:
+              profile?.avatar ||
+              "https://cdn-icons-png.flaticon.com/512/149/149071.png",
+          };
+        })
+      );
+
+      setFeaturedJobs(jobsWithAvatars);
+      setLoading(false);
+    };
 
 
     fetchFeaturedJobs();
@@ -114,10 +130,15 @@ const FeaturedJobs = () => {
                 <div className="flex justify-between items-start mb-6">
                   <div className="flex items-center space-x-4">
                     <img
-                      src={`${job.user_avatar}?t=${new Date().getTime()}`} // 👈 avoid cache
+                      src={`${job.user_avatar}?t=${new Date().getTime()}`}
                       alt="User Avatar"
                       className="w-14 h-14 rounded-full object-cover bg-[#2fa26a]/10"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+                      }}
                     />
+
                     <div>
                       <h3 className="text-lg font-semibold text-gray-800 group-hover:text-[#244034] transition-colors">
                         {job.title}

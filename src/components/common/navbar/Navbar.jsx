@@ -13,6 +13,8 @@ const Navbar = ({ transparent }) => {
   const [avatarUrl, setAvatarUrl] = useState(null);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const { user, signOutUser } = useAuth();
+  console.log(user);
+
   const [logoutLoading, setLogoutLoading] = useState(false);
   const [postLoading, setPostLoading] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -29,32 +31,32 @@ const Navbar = ({ transparent }) => {
     setShowLogoutModal(false);
     setopen(false);
   };
-  useEffect(() => {
-    const fetchAvatar = async () => {
-      if (!user) return;
-      // console.log(user, "---------user");
+  // useEffect(() => {
+  //   const fetchAvatar = async () => {
+  //     if (!user) return;
+  //     // console.log(user, "---------user");
 
-      const { data, error } = await supaBase
-        .from("profiles")
-        .select("avatar")
-        .eq("user_id", user.id)
-        .limit(1)
-        .single();
+  //     const { data, error } = await supaBase
+  //       .from("profiles")
+  //       .select("avatar")
+  //       .eq("user_id", user.id)
+  //       .limit(1)
+  //       .single();
 
-      if (error) {
-        // console.error("Error fetching avatar:", error);
-        return;
-      }
-      if (data) {
-        setAvatarUrl(data?.avatar || null);
-      } else {
-        // console.warn("No avatar found for this user");
-        setAvatarUrl(null);
-      }
-    };
+  //     if (error) {
+  //       // console.error("Error fetching avatar:", error);
+  //       return;
+  //     }
+  //     if (data) {
+  //       setAvatarUrl(data?.avatar || null);
+  //     } else {
+  //       // console.warn("No avatar found for this user");
+  //       setAvatarUrl(null);
+  //     }
+  //   };
 
-    fetchAvatar();
-  }, [user]);
+  //   fetchAvatar();
+  // }, [user]);
   const handlePostJobClick = () => {
     setPostLoading(true);
     setTimeout(() => {
@@ -182,14 +184,14 @@ const Navbar = ({ transparent }) => {
               onClick={() => setOpenProfileDropdown(!openProfileDropdown)}
             >
               <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-[#c5f542] flex items-center justify-center bg-blue-600 text-white font-bold uppercase">
-                {avatarUrl ? (
+                {user?.avatar && user.avatar.startsWith("http") ? (
                   <img
-                    src={`${avatarUrl}?t=${new Date().getTime()}`}
+                    src={`${user.avatar}`}
                     alt="User Avatar"
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <span>
+                  <span className="text-sm">
                     {user?.user_metadata?.fullName
                       ?.split(" ")
                       .map((n) => n[0])
