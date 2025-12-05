@@ -174,7 +174,7 @@ const JobPortal = () => {
     setLoadingCategory(categoryName); // loading state set karo
     navigate(`jobs?category=${encodeURIComponent(categoryName)}`)
 
-    
+
   }
 
   // Top companies
@@ -258,8 +258,8 @@ const JobPortal = () => {
                     key={index}
                     onClick={() => handleCategoryClick(category.name)}
                     className={`relative group bg-white/80 backdrop-blur-md border border-gray-100 rounded-2xl shadow-md hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 hover:border-[#2fa26a]/50 cursor-pointer overflow-hidden ${loadingCategory
-                        ? "opacity-60 cursor-not-allowed pointer-events-none"
-                        : ""
+                      ? "opacity-60 cursor-not-allowed pointer-events-none"
+                      : ""
                       }`}
                   >
                     {/* Glow Overlay */}

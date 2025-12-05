@@ -109,15 +109,18 @@ const PostJob = () => {
         .single();
 
       // const user = userData.user;
-      // console.log("👤 Logged-in user:", user);
-      // console.log("👤 Logged-in user profile:", profileData);
+      console.log("👤 Logged-in user:", user);
+      console.log("👤 Logged-in user profile:", profileData);
 
       // ✅ Add user_id
+      console.log(profileData);
+      
       const jobData = {
         ...data,
         // user_avatar: profileData?.avatar,
         user_avatar: profileData?.avatar || "",   // store avatar
-        user_name: profileData?.name || user?.email?.split("@")[0], // store name fallback
+        user_name: profileData?.companyName || user?.email?.split("@")[0],
+        companyName:user?.user_metadata?.companyName, // store name fallback
         user_id: user.id,
 
       };

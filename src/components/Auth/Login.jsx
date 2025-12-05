@@ -94,26 +94,26 @@ const Login = () => {
             />
             {errors.email && <p className="text-red-500 text-sm mt-2">{errors.email}</p>}
             <div className="relative">
-  <input
-    value={password}
-    onChange={(e) => {
-      setPassword(e.target.value);
-      if (errors.password) setErrors((prev) => ({ ...prev, password: "" }));
-    }}
-    type={showPassword ? "text" : "password"}
-    placeholder="Password"
-    className="w-full p-3 pr-10 rounded-md bg-white/20 border border-white/30 placeholder-white text-white focus:outline-none focus:ring-2 focus:ring-[#98ffcc]"
-  />
-  {/* Eye toggle button */}
-  <button
-    type="button"
-    onClick={() => setShowPassword(!showPassword)}
-    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white"
-  >
-    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-  </button>
-  {errors.password && <p className="text-red-500 text-sm mt-2">{errors.password}</p>}
-</div>
+              <input
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  if (errors.password) setErrors((prev) => ({ ...prev, password: "" }));
+                }}
+                type={showPassword ? "text" : "password"}
+                placeholder="Password"
+                className="w-full p-3 pr-10 rounded-md bg-white/20 border border-white/30 placeholder-white text-white focus:outline-none focus:ring-2 focus:ring-[#98ffcc]"
+              />
+              {/* Eye toggle button */}
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white"
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+              {errors.password && <p className="text-red-500 text-sm mt-2">{errors.password}</p>}
+            </div>
             <button
               type="submit"
               disabled={loading}

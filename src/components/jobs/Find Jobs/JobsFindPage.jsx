@@ -61,7 +61,8 @@ return {
     const loadJobs = async () => {
       setLoading(true);
 
-      let q = supabase.from("Jobs").select("*");
+    let q = supabase.from("Jobs").select("*").eq("is_visible", true);
+
       if (categoryFilter) q = q.eq("category", categoryFilter);
 
       const { data } = await q;

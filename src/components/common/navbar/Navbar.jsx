@@ -3,60 +3,27 @@ import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import images from "../../../assets/images/images.png";
 import { LoaderCircle, Menu, X } from 'lucide-react';
 import { useAuth } from '../../Auth/AuthContext';
-import ProfilePage from '../../../pages/ProfilePage/ProfilePage';
 import supaBase from '../../../services/supabaseClient';
-// import DashboardStats from '../../dashboard/DashboardStats';
 
 const Navbar = ({ transparent }) => {
   const location = useLocation();
   const [open, setopen] = useState(false);
-  const [avatarUrl, setAvatarUrl] = useState(null);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const { user, signOutUser } = useAuth();
-  console.log(user);
-
-  const [logoutLoading, setLogoutLoading] = useState(false);
   const [postLoading, setPostLoading] = useState(false);
-  const [loading, setLoading] = useState(false);
   const isAboutPage = location.pathname === "/about";
   const isContactPage = location.pathname === "/contactus";
   const [scrolled, setScrolled] = useState(false);
-  const [openProfileDropdown, setOpenProfileDropdown] = useState("")
+  const [openProfileDropdown, setOpenProfileDropdown] = useState(false)
   const role = user?.user_metadata?.role;
-  // const navigate = useNavigate();
-
   const navigate = useNavigate();
+
   const handleLogout = async () => {
     await signOutUser();
     setShowLogoutModal(false);
     setopen(false);
   };
-  // useEffect(() => {
-  //   const fetchAvatar = async () => {
-  //     if (!user) return;
-  //     // console.log(user, "---------user");
 
-  //     const { data, error } = await supaBase
-  //       .from("profiles")
-  //       .select("avatar")
-  //       .eq("user_id", user.id)
-  //       .limit(1)
-  //       .single();
-
-  //     if (error) {
-  //       // console.error("Error fetching avatar:", error);
-  //       return;
-  //     }
-  //     if (data) {
-  //       setAvatarUrl(data?.avatar || null);
-  //     } else {
-  //       // console.warn("No avatar found for this user");
-  //       setAvatarUrl(null);
-  //     }
-  //   };
-
-  //   fetchAvatar();
-  // }, [user]);
   const handlePostJobClick = () => {
     setPostLoading(true);
     setTimeout(() => {
@@ -64,13 +31,7 @@ const Navbar = ({ transparent }) => {
       setPostLoading(false);
     }, 1500);
   }
-  // const handleLogoutClick = () => {
-  //   setLogoutLoading(true);
-  //   setTimeout(() => {
-  //     setShowLogoutModal(true);
-  //     setLogoutLoading(false);
-  //   }, 2000);
-  // };
+
   useEffect(() => {
     const handleScroll = () => {
       const isScrolled = window.scrollY > 50;
@@ -78,30 +39,78 @@ const Navbar = ({ transparent }) => {
     };
 
     window.addEventListener("scroll", handleScroll);
-
-    // Cleanup
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []); // Empty dependency array
+  }, []);
 
-  const menuItems = [
-    { name: "Home", path: "/" },
-    { name: "Find Jobs", path: "/jobs" },
-    { name: "About", path: "/about" },
-    { name: "Contact", path: "/contactus" },
-    { name: "Blogs", path: "/blogs" },
-  ];
+  // Menu items based on role and login status
+  const getMenuItems = () => {
+  if (!user) {
+    // Logged-out users: only public menu
+    return [
+      { name: "Home", path: "/" },
+      { name: "Find Jobs", path: "/jobs" },
+      { name: "About", path: "/about" },
+      { name: "Contact", path: "/contactus" },
+      { name: "Blogs", path: "/blogs" },
+    ];
+  }
 
-  const sideAction = [
-    { name: "Home", path: "/" },
-    { name: "Find Jobs", path: "/jobs" },
-    { name: "About", path: "/about" },
-    { name: "Blogs", path: "/blogs" },
-    { name: "Contact", path: "/contactus" },
-    // { name: "Login", path: "/login" },
-    { name: "Post Job", path: "/post-job" },
-    // { name: "Profile", path: "/profile" }
-  ];
+  // Logged-in users
+  if (role === "seeker") {
+    return [
+      { name: "Home", path: "/" },
+      { name: "Find Jobs", path: "/jobs" },
+      { name: "About", path: "/about" },
+      { name: "Contact", path: "/contactus" },
+      { name: "Blogs", path: "/blogs" },
+      { name: "Applied Jobs", path: "/applied" }, // only seeker
+    ];
+  } else if (role === "company") {
+    return [
+      { name: "My Jobs", path: "/myjobs" },
+      { name: "View Applications", path: "/viewapplications" },
+    ];
+  }
 
+  return [];
+};
+
+  // Side menu items for mobile
+  const getSideMenuItems = () => {
+  if (!user) {
+    return [
+      { name: "Home", path: "/" },
+      { name: "Find Jobs", path: "/jobs" },
+      { name: "About", path: "/about" },
+      { name: "Blogs", path: "/blogs" },
+      { name: "Contact", path: "/contactus" },
+      { name: "Login", path: "/login" }, // show login
+    ];
+  }
+
+  if (role === "seeker") {
+    return [
+      { name: "Home", path: "/" },
+      { name: "Find Jobs", path: "/jobs" },
+      { name: "About", path: "/about" },
+      { name: "Blogs", path: "/blogs" },
+      { name: "Contact", path: "/contactus" },
+      { name: "Applied Jobs", path: "/applied" },
+    ];
+  } else if (role === "company") {
+    return [
+      { name: "Post Job", path: "/post-job" },
+      { name: "My Jobs", path: "/myjobs" },
+      { name: "View Applications", path: "/viewapplications" },
+    ];
+  }
+
+  return [];
+};
+
+
+  const menuItems = getMenuItems();
+  const sideMenuItems = getSideMenuItems();
 
   return (
     <nav
@@ -156,7 +165,8 @@ const Navbar = ({ transparent }) => {
 
       {/* RIGHT: Profile avatar (always visible) */}
       <div className="flex items-center gap-3">
-        {user?.user_metadata?.role === "company" && (
+        {/* Post Job button - only for logged in companies */}
+        {user && role === "company" && (
           <button
             onClick={handlePostJobClick}
             disabled={postLoading}
@@ -177,7 +187,7 @@ const Navbar = ({ transparent }) => {
         )}
 
         {user ? (
-          <li className="relative">
+          <div className="relative">
             {/* Profile button */}
             <button
               className="profile-button cursor-pointer"
@@ -213,26 +223,28 @@ const Navbar = ({ transparent }) => {
 
                 {/* dropdown itself */}
                 <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg p-4 z-50">
-                  <p className="font-semibold">{user?.displayName}</p>
-                  <p className="text-sm text-gray-500">{user?.email}</p>
+                  <p className="font-semibold">{user?.user_metadata?.fullName || user?.email}</p>
+                  {/* <p className="text-sm text-gray-500">{user?.email}</p> */}
+                  {/* <p className="text-xs text-gray-400 capitalize">{role}</p> */}
                   <Link
                     to="/profile"
-                    className="block mt-2 text-[#244034] hover:underline hover:text-green-500"
+                    className="block mt-2 px-3 py-2 text-[#244034] rounded-lg transition-all duration-300 hover:bg-[#c5f542] hover:text-black font-semibold"
+                    onClick={() => setOpenProfileDropdown(false)}
                   >
                     View Profile
                   </Link>
                   <button
                     onClick={handleLogout}
-                    className="mt-2 cursor-pointer w-full bg-red-500 text-white rounded-lg py-1"
+                    className="mt-2 cursor-pointer w-full bg-red-500 text-white rounded-lg py-1 hover:bg-red-600 transition duration-300"
                   >
                     Logout
                   </button>
                 </div>
               </>
             )}
-          </li>
-
+          </div>
         ) : (
+          // Login button for logged out users
           <Link
             to="/login"
             className="text-base font-bold bg-[#c5f542] hover:text-white rounded-2xl transition duration-300 p-3"
@@ -254,27 +266,22 @@ const Navbar = ({ transparent }) => {
           {/* Mobile menu */}
           <div className="absolute top-20 left-0 w-full bg-white shadow-md md:hidden z-50">
             <ul className="flex flex-col items-center space-y-4 py-4 text-gray-800 font-semibold">
-              {sideAction
-                .filter(item => item.name !== "Post Job" || role === "company") // filter Post Job based on role
-                .map((item, i) => (
-                  <li key={i}>
-                    <Link
-                      to={item.path}
-                      className="text-base font-bold hover:bg-[#c5f542] rounded-2xl transition duration-300 p-3"
-                      onClick={() => setopen(false)} // menu item click closes menu
-                    >
-                      {item.name}
-                    </Link>
-                  </li>
-                ))}
+              {sideMenuItems.map((item, i) => (
+                <li key={i}>
+                  <Link
+                    to={item.path}
+                    className="text-base font-bold hover:bg-[#c5f542] rounded-2xl transition duration-300 p-3"
+                    onClick={() => setopen(false)}
+                  >
+                    {item.name}
+                  </Link>
+                </li>
+              ))}
             </ul>
-
           </div>
         </>
       )}
-
     </nav>
-
   );
 };
 

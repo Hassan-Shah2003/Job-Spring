@@ -1,11 +1,15 @@
 import { Bookmark, MapPin, SendHorizontal, Slash } from "lucide-react";
+import { formatReadableDate } from "../../../services/utils/functions";
 
 const JobCard = ({ job }) => {
+  // console.log(job);
+  const formattedDate = formatReadableDate(job?.created_at)
   return (
     <div className="border border-gray-400 rounded-xl p-4 shadow-sm hover:shadow-gray-500 transition w-[100%] relative bg-white cursor-pointer">
       <div className="flex gap-2 mb-2">
         <span className="bg-blue-100 text-blue-700 text-xs font-medium px-2 py-1 rounded">
           {job.type}
+          {formattedDate}
         </span>
       </div>
 

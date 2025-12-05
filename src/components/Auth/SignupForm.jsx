@@ -12,7 +12,7 @@ const SignupForm = () => {
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
     const navigate = useNavigate();
-    
+
     const [formData, setFormData] = useState({
         fullName: "",
         email: "",
@@ -48,7 +48,7 @@ const SignupForm = () => {
             setErrors({});
             await SignupSchema.validate(formData, { abortEarly: false });
             const { error } = await SignUpUser(formData);
-            
+
             if (!error) {
                 toast.success("Signup successful! Please verify your email.");
                 setFormData({
@@ -108,7 +108,7 @@ const SignupForm = () => {
                         />
                         {errors.fullName && <p className="text-red-500 text-sm mt-2">{errors.fullName}</p>}
                     </div>
-                    
+
                     <div className="mb-2">
                         <input
                             name="email"
@@ -120,7 +120,7 @@ const SignupForm = () => {
                         />
                         {errors.email && <p className="text-red-500 text-sm mt-2">{errors.email}</p>}
                     </div>
-                    
+
                     <div className="mb-4 relative w-full">
                         <input
                             name="password"
@@ -139,7 +139,7 @@ const SignupForm = () => {
                         </button>
                         {errors.password && <p className="text-red-500 mt-2 text-sm">{errors.password}</p>}
                     </div>
-                    
+
                     <div className="mb-2">
                         <select
                             name="role"
@@ -153,7 +153,7 @@ const SignupForm = () => {
                         </select>
                         {errors.role && <p className="text-red-500 text-sm mt-2">{errors.role}</p>}
                     </div>
-                    
+
                     <div className="mb-2">
                         {formData.role === "company" && (
                             <input
@@ -166,7 +166,7 @@ const SignupForm = () => {
                         )}
                         {errors.companyName && <p className="text-red-500 mt-2 text-sm">{errors.companyName}</p>}
                     </div>
-                    
+
                     <div className="mb-2">
                         <input
                             name="phone"
@@ -177,7 +177,7 @@ const SignupForm = () => {
                         />
                         {errors.phone && <p className="text-red-500 text-sm mt-2">{errors.phone}</p>}
                     </div>
-                    
+
                     <div className="mb-2">
                         <input
                             name="location"
@@ -188,7 +188,7 @@ const SignupForm = () => {
                         />
                         {errors.location && <p className="text-red-500 text-sm mt-2">{errors.location}</p>}
                     </div>
-                    
+
                     <div className="mb-2">
                         <textarea
                             name="about"
@@ -199,7 +199,7 @@ const SignupForm = () => {
                         />
                         {errors.about && <p className="text-red-500 text-sm mt-2">{errors.about}</p>}
                     </div>
-                    
+
                     <button
                         type="submit"
                         disabled={loading}
@@ -210,7 +210,7 @@ const SignupForm = () => {
                         )}
                         {loading ? "Signing Up..." : "Sign Up"}
                     </button>
-                    
+
                     <div className="text-center pt-2">
                         <Link to={"/login"} className="text-[#98ffcc] font-semibold hover:underline">
                             Already Have Account?

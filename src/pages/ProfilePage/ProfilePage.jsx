@@ -210,7 +210,7 @@ const addArrayItem = (arrayName) => {
         .eq("user_id", user.id)
         .select() // 👈 ye line add karo (taake updated data turant mile)
         .single();
-      // console.log(data);
+      console.log(data);
 
       if (error) throw error;
 
