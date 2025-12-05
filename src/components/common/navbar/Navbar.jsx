@@ -18,11 +18,17 @@ const Navbar = ({ transparent }) => {
   const role = user?.user_metadata?.role;
   const navigate = useNavigate();
 
-  const handleLogout = async () => {
-    await signOutUser();
+const handleLogout = async () => {
+  try {
+    await signOutUser(); // AuthProvider me already toast handle hota
     setShowLogoutModal(false);
     setopen(false);
-  };
+    navigate("/login"); // redirect karna hai to yaha
+  } catch (err) {
+    console.error("Logout failed:", err.message);
+    toast.error("Logout failed. Please try again.");
+  }
+};
 
   const handlePostJobClick = () => {
     setPostLoading(true);
